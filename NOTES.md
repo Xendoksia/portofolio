@@ -30,7 +30,7 @@
 1. `npm run dev` → gerçek his testi (scroll, tema geçişi, hero girişi). Gerekirse yukarıdaki bench ile ölç.
 2. Tek katman halini görsel kontrol et (yıldız yoğunluğu, light side'da görünürlük).
 3. Proje kartlarına README ekran görüntüleri (`public/projects/…`, `content.ts`'e `image` alanı + Astro `<Image />`).
-4. İstatistikleri doğrula: "10+ AI/ML projects", "2 countries studied in" (`content.ts` → `stats`).
+4. ~~İstatistikleri doğrula~~ — yapıldı: "15+ AI / ML projects", "2 Countries studied in" yerine "Erasmus+ · International experience" (15+ kullanıcıdan; Erasmus+ benim önerim, 12 Kasım).
 5. Network Analysis açıklaması (repo README yok, genel bırakıldı).
 6. İsteğe bağlı: TR/EN dil seçeneği, özel imleç, gerçek telefonda test.
 7. Yayın: `git init` **yapılmadı** → GitHub repo → Vercel/Netlify/Cloudflare Pages; `astro.config.mjs` içindeki `site` adresini güncelle; OG görseli ekle.

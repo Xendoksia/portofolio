@@ -19,8 +19,8 @@ export const profile = {
   ],
   stats: [
     { value: '3', label: 'Internships' },
-    { value: '10+', label: 'AI / ML projects' },
-    { value: '2', label: 'Countries studied in' },
+    { value: '15+', label: 'AI / ML projects' },
+    { value: 'Erasmus+', label: 'International experience' },
     { value: 'M.Sc.', label: 'In progress' },
   ],
 };
