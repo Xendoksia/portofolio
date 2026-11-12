@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  // Yayına alınca kendi alan adınla değiştir (örn. https://deniz.dev)
-  site: 'https://example.com',
+  // Yayın adresi (Cloudflare Pages). Alan adı alınırsa burayı değiştir.
+  site: 'https://deniz-kanlicalioglu.pages.dev',
 });
