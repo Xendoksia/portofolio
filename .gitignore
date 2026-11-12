@@ -1,0 +1,39 @@
+# ---------- Bağımlılıklar ----------
+node_modules/
+
+# ---------- Build çıktıları ----------
+dist/
+.astro/
+.output/
+.vercel/
+.netlify/
+
+# ---------- Ortam değişkenleri / gizli bilgiler ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Loglar ----------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# ---------- Editör / IDE ----------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ---------- İşletim sistemi ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ---------- Proje ----------
+# Kök dizindeki orijinal CV; sitenin yayınladığı kopya public/ içinde
+/000001Deniz_Kanlicalioglu_CV.pdf

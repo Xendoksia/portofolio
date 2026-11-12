@@ -1,0 +1,83 @@
+---
+import { profile } from '../data/content';
+---
+
+<section id="about">
+  <div class="container">
+    <p class="section-label" data-reveal>Episode I · About</p>
+    <h2 class="section-title" data-reveal>From raw data<br />to deployed models.</h2>
+
+    <div class="about">
+      <!-- Hafif perspektifli, scroll'la düzleşen metin bloğu -->
+      <div class="about__crawl" data-crawl>
+        {profile.summary.map((p) => <p>{p}</p>)}
+      </div>
+
+      <ul class="about__stats">
+        {
+          profile.stats.map((s) => (
+            <li class="card" data-reveal>
+              <span class="about__value">{s.value}</span>
+              <span class="about__label mono">{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(32px, 6vw, 80px);
+    align-items: start;
+  }
+  .about__crawl {
+    perspective: 600px;
+    font-size: clamp(1.02rem, 1.6vw, 1.18rem);
+  }
+  .about__crawl p {
+    margin: 0 0 1.2em;
+    color: var(--muted);
+  }
+  .about__crawl p:first-child {
+    color: var(--text);
+  }
+  html.anim .about__crawl {
+    transform-origin: 50% 100%;
+    transform: perspective(600px) rotateX(28deg) translateY(40px);
+    opacity: 0;
+  }
+  .about__stats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .about__stats li {
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .about__value {
+    font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--gold);
+  }
+  .about__label {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  @media (max-width: 860px) {
+    .about {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

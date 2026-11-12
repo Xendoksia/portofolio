@@ -1,0 +1,62 @@
+---
+import { skills } from '../data/content';
+---
+
+<section id="skills">
+  <div class="container">
+    <p class="section-label" data-reveal>Episode IV · Skills</p>
+    <h2 class="section-title" data-reveal>The toolkit.</h2>
+
+    <div class="skills">
+      {
+        skills.map((s) => (
+          <div class="card skills__group" data-reveal>
+            <h3 class="mono">{s.group}</h3>
+            <ul>
+              {s.items.map((item) => (
+                <li class="chip">{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .skills {
+    columns: 3 300px;
+    column-gap: 18px;
+  }
+  .skills__group {
+    break-inside: avoid;
+    margin-bottom: 18px;
+    padding: 22px;
+  }
+  h3 {
+    margin: 0 0 14px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    color: var(--text);
+    font-size: 13px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .chip:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 14px var(--accent-soft);
+  }
+</style>

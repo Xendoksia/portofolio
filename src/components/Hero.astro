@@ -1,0 +1,171 @@
+---
+import { profile } from '../data/content';
+
+const split = (text: string) => [...text];
+---
+
+<section class="hero" id="top">
+  <div class="container hero__inner">
+    <p class="hero__intro mono" data-hero="intro">
+      Not so long ago, in a lab not so far away<span class="hero__caret">…</span>
+    </p>
+
+    <h1 class="hero__name" aria-label={profile.name}>
+      <span class="hero__line" aria-hidden="true">
+        {split(profile.firstName).map((c) => <span class="char">{c}</span>)}
+      </span>
+      <span class="hero__line hero__line--outline" aria-hidden="true">
+        {split(profile.lastName).map((c) => <span class="char">{c}</span>)}
+      </span>
+    </h1>
+
+    <div class="hero__saber" data-hero="saber" aria-hidden="true"></div>
+
+    <p class="hero__roles" data-hero="fade">
+      {
+        profile.roles.map((r, i) => (
+          <>
+            {i > 0 && <span class="hero__sep">/</span>}
+            <span>{r}</span>
+          </>
+        ))
+      }
+    </p>
+
+    <p class="hero__tagline" data-hero="fade">{profile.tagline}</p>
+
+    <div class="hero__cta" data-hero="fade">
+      <a class="btn btn--primary" href="#projects" data-magnetic>
+        Explore projects
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+      </a>
+      <a class="btn" href={profile.cv} download data-magnetic>
+        Download CV
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"></path></svg>
+      </a>
+    </div>
+  </div>
+
+  <a href="#about" class="hero__scroll mono" data-hero="fade" aria-label="Scroll to about">
+    <span>scroll</span>
+    <span class="hero__scroll-line"></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    padding-block: 120px 100px;
+  }
+  .hero__intro {
+    color: var(--accent);
+    font-size: clamp(13px, 1.6vw, 15px);
+    letter-spacing: 0.04em;
+    margin: 0 0 22px;
+    filter: saturate(0.85);
+  }
+  :root[data-theme='dark'] .hero__intro {
+    color: #6fb6ff; /* açılış satırı her zaman o tanıdık soğuk mavi */
+  }
+  .hero__name {
+    margin: 0;
+    font-size: clamp(2.6rem, 10.5vw, 9rem);
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    font-weight: 700;
+  }
+  .hero__line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.06em;
+  }
+  .hero__line--outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--text);
+  }
+  .char {
+    display: inline-block;
+  }
+  html.anim .char {
+    transform: translateY(110%);
+  }
+
+  .hero__saber {
+    width: min(420px, 70%);
+    height: 3px;
+    margin: 34px 0 30px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #fff 0%, #fff 80%, transparent);
+    box-shadow: var(--glow);
+    transform-origin: left center;
+  }
+  html.anim .hero__saber {
+    transform: scaleX(0);
+  }
+
+  .hero__roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 0 0 18px;
+    font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+    font-weight: 500;
+  }
+  .hero__sep {
+    color: var(--accent);
+  }
+  .hero__tagline {
+    max-width: 560px;
+    color: var(--muted);
+    margin: 0 0 36px;
+  }
+  .hero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  html.anim [data-hero='intro'],
+  html.anim [data-hero='fade'] {
+    opacity: 0;
+  }
+
+  .hero__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: 28px;
+    translate: -50% 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .hero__scroll-line {
+    width: 1px;
+    height: 46px;
+    background: linear-gradient(var(--accent), transparent);
+    animation: drip 2.2s ease-in-out infinite;
+    transform-origin: top;
+  }
+  @keyframes drip {
+    0% { transform: scaleY(0); opacity: 1; }
+    60% { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(1); opacity: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .hero__line--outline {
+      -webkit-text-stroke-width: 1px;
+    }
+    .hero__scroll {
+      display: none;
+    }
+  }
+</style>

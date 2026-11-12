@@ -1,0 +1,194 @@
+/* ---------- Tema değişkenleri ----------
+   dark  = "dark side"  : derin uzay + kırmızı ışın
+   light = "light side" : açık zemin + mavi ışın            */
+:root,
+:root[data-theme='dark'] {
+  --bg: #05060a;
+  --bg-elev: #0c0e15;
+  --surface: rgba(255, 255, 255, 0.035);
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #e8e9ee;
+  --muted: #8b90a0;
+  --accent: #ff3b3b;
+  --accent-soft: rgba(255, 59, 59, 0.14);
+  --glow: 0 0 6px #ff3b3b, 0 0 18px rgba(255, 40, 40, 0.65), 0 0 42px rgba(255, 30, 30, 0.35);
+  --star: 255, 255, 255;
+  --gold: #e6c26a;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  /* "light side": göz yormayan alacakaranlık laciverti + mavi ışın */
+  --bg: #1b2232;
+  --bg-elev: #242c3e;
+  --surface: rgba(255, 255, 255, 0.045);
+  --border: rgba(170, 195, 235, 0.14);
+  --text: #e3e8f1;
+  --muted: #9ea9bc;
+  --accent: #4ea3ff;
+  --accent-soft: rgba(78, 163, 255, 0.16);
+  --glow: 0 0 6px #6bb4ff, 0 0 18px rgba(60, 150, 255, 0.6), 0 0 42px rgba(60, 150, 255, 0.3);
+  --star: 205, 222, 255;
+  --gold: #e2c27c;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Bölüm geçişleri JS ile yapılır (GSAP); CSS smooth scroll onunla çakışır */
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.container {
+  width: min(1120px, 100% - 32px);
+  margin-inline: auto;
+}
+
+section {
+  position: relative;
+  scroll-margin-top: 40px;
+  padding-block: clamp(80px, 12vw, 140px);
+}
+
+/* Bölüm başlığı: "EPISODE I · About" */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.section-label::before {
+  content: '';
+  width: 36px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: var(--glow);
+}
+
+.section-title {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 clamp(36px, 6vw, 64px);
+  font-weight: 600;
+}
+
+/* Butonlar */
+.btn {
+  --b: var(--border);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  border: 1px solid var(--b);
+  background: var(--surface);
+  color: var(--text);
+  font: 500 15px/1 'Space Grotesk', sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+}
+.btn:hover {
+  --b: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 28px var(--accent-soft);
+}
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn--primary:hover {
+  box-shadow: var(--glow);
+}
+.btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Kart yüzeyi */
+.card {
+  position: relative;
+  /* backdrop-filter yerine yarı saydam düz zemin: çok daha ucuz, scroll'da kasmaz */
+  background: color-mix(in srgb, var(--bg-elev) 78%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font: 12px/1.4 'JetBrains Mono', monospace;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Animasyon başlangıç durumları — sadece JS + animasyon açıkken gizlenir */
+html.anim [data-reveal]:not(.is-in) {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Tema geçişi (View Transitions) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

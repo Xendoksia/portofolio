@@ -1,0 +1,125 @@
+---
+import { profile } from '../data/content';
+const year = new Date().getFullYear();
+---
+
+<section id="contact" class="contact">
+  <div class="container">
+    <p class="section-label" data-reveal>Episode VI · Contact</p>
+    <h2 class="contact__title" data-reveal>
+      Open a <span>channel</span>.
+    </h2>
+    <p class="contact__text" data-reveal>
+      Looking for an AI / ML engineer, a hackathon teammate, or just want to talk models? My inbox is always open.
+    </p>
+
+    <div class="contact__mail" data-reveal>
+      <a class="contact__email" href={`mailto:${profile.email}`}>{profile.email}</a>
+      <button class="btn" type="button" id="copy-email" data-email={profile.email}>
+        <span id="copy-label">Copy</span>
+      </button>
+    </div>
+
+    <ul class="contact__links" data-reveal>
+      <li>
+        <a class="btn" href={profile.github} target="_blank" rel="noopener" data-magnetic>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"></path></svg>
+          GitHub
+        </a>
+      </li>
+      <li>
+        <a class="btn" href={profile.linkedin} target="_blank" rel="noopener" data-magnetic>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6h.1c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2ZM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2ZM7.1 20.5H3.5V9h3.6v11.5ZM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0Z"></path></svg>
+          LinkedIn
+        </a>
+      </li>
+      <li>
+        <a class="btn btn--primary" href={profile.cv} download data-magnetic>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"></path></svg>
+          Download CV
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <footer class="footer container mono">
+    <span>© {year} {profile.name}</span>
+    <span class="footer__motto">May the code be with you.</span>
+  </footer>
+</section>
+
+<style>
+  .contact {
+    padding-bottom: 40px;
+  }
+  .contact__title {
+    font-size: clamp(2.6rem, 8vw, 6rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    margin: 0 0 22px;
+    font-weight: 700;
+  }
+  .contact__title span {
+    color: var(--accent);
+    text-shadow: 0 0 30px var(--accent-soft);
+  }
+  .contact__text {
+    max-width: 520px;
+    color: var(--muted);
+    margin: 0 0 36px;
+  }
+  .contact__mail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 20px;
+    margin-bottom: 30px;
+  }
+  .contact__email {
+    font-size: clamp(1.15rem, 3.4vw, 2rem);
+    font-weight: 500;
+    text-decoration: none;
+    background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 2px no-repeat;
+    transition: background-size 0.4s;
+    word-break: break-all;
+  }
+  .contact__email:hover {
+    background-size: 100% 2px;
+  }
+  .contact__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: clamp(80px, 12vw, 140px);
+    padding-top: 26px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .footer__motto {
+    color: var(--gold);
+  }
+</style>
+
+<script>
+  const btn = document.getElementById('copy-email') as HTMLButtonElement;
+  const label = document.getElementById('copy-label')!;
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(btn.dataset.email!);
+      label.textContent = 'Copied ✓';
+    } catch {
+      label.textContent = 'Copy failed';
+    }
+    setTimeout(() => (label.textContent = 'Copy'), 1800);
+  });
+</script>
