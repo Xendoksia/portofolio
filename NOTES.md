@@ -83,3 +83,9 @@
 **5. İsteğe bağlı**
 - TR/EN dil seçeneği (en çok emek; tüm metinlerin çevirisi).
 - Ziyaretçi sayacı: Cloudflare Web Analytics (çerezsiz, onay bandı gerekmez).
+
+## KALDIĞIMIZ YER (12 Kasım, ~22:25)
+- Site yayında: https://deniz-kanlicalioglu.vercel.app (Türkiye'den açılıyor; ana sayfa, /projects, CV, lightbox canlıda test edildi).
+- **Commit akışı (kullanıcı onayı):** "commit et" denince doğrudan `main`'e commit + push → birkaç dakikada canlı. Push'tan önce yerelde `npm run build` + tarayıcıda kontrol.
+- Cloudflare'deki eski Worker/Pages projeleri silinmeli (kullanıcı tarafında; silinmediyse her push'ta boşuna build alır).
+- Sıradaki iş: yukarıdaki "SONRA YAPILACAKLAR" → 2 (OG görseli + sitemap/robots), sonra 3–5.
