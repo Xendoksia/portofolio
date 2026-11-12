@@ -61,3 +61,24 @@
 - **F5 ana sayfada en üstten başlar** (`index.astro` başındaki inline script; yalnızca `reload` türü gezinmede, `#bölüm` adresten silinir). `/projects`'ten `/#about` linkleri ve `/projects` sayfasının kendi F5'i etkilenmez. Gerçek Chrome'da test edildi.
 - **Lightbox galeri gezintisi** (`projects.astro`): yanlarda ok düğmeleri (üstüne gelince accent parıltı), ←/→ tuşları, telefonda yatay kaydırma, `01 / 11` sayaç, başa/sona sarar. Komşu görseller önceden yüklenir; geçiş 220 ms kayma+belirme (hareketi azalt'ta yok). Kapatınca kutu son bakılan slaytta kalır. Tek görselli vakalarda oklar gizli. Görsel alanı sabit yükseklik (oklar zıplamaz).
 - **Ana sayfa projeleri azaltıldı** (`Projects.astro`): yalnızca `featured` 3 büyük kart + `/projects`'e çağıran "hangar" paneli (gizli projelerin adları chip olarak, `+06 more missions · 5 full case studies`, büyük accent düğme, üstte hover'da uzayan ışın çizgisi). Küçük 6 kart ana sayfadan kalktı; GitHub linki panelin altında küçük metin. Hangi projelerin ana sayfada kalacağı `content.ts` → `featured`.
+
+## SONRA YAPILACAKLAR (12 Kasım, ~22:00 — yayından sonra sırayla)
+**Yayın (şimdi):** Cloudflare Pages önerildi (ücretsiz, sınırsız trafik, her `main` push'unda otomatik yayın, dahili Web Analytics). Build: `npm run build`, çıktı `dist`, Node sürümü `.node-version` (22). Yayın adresi belli olunca `astro.config.mjs` → `site` güncellenecek. Yayından sonra `main` push = canlı; commit akışını kullanıcıya tekrar sor.
+
+**2. Paylaşım / bulunabilirlik**
+- OG görseli (1200×630, site temasında) + `og:image` / `twitter:card` meta etiketleri (`Layout.astro`). Şu an yok → LinkedIn/WhatsApp önizlemesi boş.
+- `@astrojs/sitemap` + `public/robots.txt` (sitemap adresiyle). `site` ayarı doğru olmalı.
+- Her vaka için paylaşılabilir link: `/projects#playlist-tracker` gibi (CaseStudy `<section>`'larına id; açılışta o vakaya kaydır).
+
+**3. Kalite**
+- Lighthouse (hedef 90+): performans, erişilebilirlik, SEO. Lightbox ve hangar paneli dahil.
+- Gerçek telefonda test: kaydırma, lightbox'ta kaydırarak geçiş, dar ekranda hangar paneli.
+
+**4. İçerik**
+- Network Analysis açıklaması (README yok; kullanıcıdan birkaç cümle al).
+- Playlist Tracker ana sayfada öne çıksın mı? (`content.ts` → `featured: true` → 4 büyük kart; grid düzenini kontrol et.)
+- AutoRate "Caption BLEU 20–25%": LSTM sürümünden; GPT-2 sürümünün skoru farklıysa güncelle/kaldır.
+
+**5. İsteğe bağlı**
+- TR/EN dil seçeneği (en çok emek; tüm metinlerin çevirisi).
+- Ziyaretçi sayacı: Cloudflare Web Analytics (çerezsiz, onay bandı gerekmez).
