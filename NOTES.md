@@ -63,7 +63,8 @@
 - **Ana sayfa projeleri azaltıldı** (`Projects.astro`): yalnızca `featured` 3 büyük kart + `/projects`'e çağıran "hangar" paneli (gizli projelerin adları chip olarak, `+06 more missions · 5 full case studies`, büyük accent düğme, üstte hover'da uzayan ışın çizgisi). Küçük 6 kart ana sayfadan kalktı; GitHub linki panelin altında küçük metin. Hangi projelerin ana sayfada kalacağı `content.ts` → `featured`.
 
 ## SONRA YAPILACAKLAR (12 Kasım, ~22:00 — yayından sonra sırayla)
-**Yayın:** Cloudflare **Pages** (Git bağlantılı, `main` push = otomatik yayın) → https://deniz-kanlicalioglu.pages.dev. Önce Workers ile kuruldu (`…deniz200214.workers.dev`), adres uzun olduğu için Pages'e geçildi. Ayar: `wrangler.jsonc` (`pages_build_output_dir: ./dist`), Node `.node-version` (22), `astro.config.mjs` → `site`. Alan adı alınırsa Pages → Custom domains + `site` güncelle. Yayından sonra `main` push = canlı; commit akışını kullanıcıya tekrar sor.
+**Yayın:** **Vercel** (GitHub bağlantılı, `main` push = otomatik yayın) → https://deniz-kanlicalioglu.vercel.app. Ayar: Vercel Astro'yu kendisi tanır; Node `.node-version` (22), `astro.config.mjs` → `site`. Alan adı alınırsa Vercel → Domains + `site` güncelle.
+- Geçmiş: önce Cloudflare Workers (`…deniz200214.workers.dev`, adres uzun) → Cloudflare Pages. **`*.pages.dev` Türkiye'de engelli** (Türk Telekom DNS'i `213.14.227.50`/`::1` döndürüyor, doğru IP'ye bağlantı da kesiliyor; 12 Kasım 2026). `vercel.app`, `netlify.app`, `github.io` açılıyor. Barındırma/alan adı değişirse önce Türkiye'den erişimi test et. Yayından sonra `main` push = canlı; commit akışını kullanıcıya tekrar sor.
 
 **2. Paylaşım / bulunabilirlik**
 - OG görseli (1200×630, site temasında) + `og:image` / `twitter:card` meta etiketleri (`Layout.astro`). Şu an yok → LinkedIn/WhatsApp önizlemesi boş.

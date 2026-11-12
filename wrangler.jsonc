@@ -1,6 +1,0 @@
-// Cloudflare Pages ayarı: site statik, build sonrası dist/ klasörü yayınlanır (build: npm run build)
-{
-  "name": "deniz-kanlicalioglu",
-  "compatibility_date": "2026-06-01",
-  "pages_build_output_dir": "./dist"
-}
