@@ -67,8 +67,19 @@ const others = projects.filter((p) => !p.case);
     <button class="lightbox__close" type="button" aria-label="Close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"></path></svg>
     </button>
-    <div class="lightbox__imgs" id="lightbox-imgs"></div>
-    <p class="lightbox__caption" id="lightbox-caption"></p>
+    <div class="lightbox__stage">
+      <div class="lightbox__imgs" id="lightbox-imgs"></div>
+      <button class="lightbox__nav lightbox__nav--prev" type="button" data-step="-1" aria-label="Previous screenshot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"></path></svg>
+      </button>
+      <button class="lightbox__nav lightbox__nav--next" type="button" data-step="1" aria-label="Next screenshot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"></path></svg>
+      </button>
+    </div>
+    <div class="lightbox__foot">
+      <p class="lightbox__caption" id="lightbox-caption" aria-live="polite"></p>
+      <p class="lightbox__count mono" id="lightbox-count"></p>
+    </div>
   </dialog>
 </Layout>
 
@@ -148,10 +159,13 @@ const others = projects.filter((p) => !p.case);
       transform: scale(0.96);
     }
   }
+  /* Sabit yükseklik: geçişte pencere boyu ve oklar zıplamaz */
   .lightbox__imgs {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 16px;
+    height: calc(92vh - 56px);
     background: var(--bg);
   }
   .lightbox__imgs :global(img) {
@@ -169,11 +183,89 @@ const others = projects.filter((p) => !p.case);
     max-height: calc(92vh - 88px);
     border-radius: 12px;
   }
+  .lightbox__stage {
+    position: relative;
+  }
+  .lightbox__foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+  }
   .lightbox__caption {
     margin: 0;
-    padding: 16px 20px;
     font-size: 14px;
     color: var(--muted);
+  }
+  .lightbox__count {
+    margin: 0;
+    flex: none;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .lightbox__count :global(b) {
+    font-weight: 500;
+    color: var(--accent);
+  }
+  /* Önceki / sonraki: yanlarda yuvarlak düğme, üstüne gelince ışın parıltısı */
+  .lightbox__nav {
+    position: absolute;
+    top: 50%;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    color: var(--text);
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: border-color 0.2s, box-shadow 0.2s, color 0.2s, transform 0.2s;
+  }
+  .lightbox__nav--prev {
+    left: 14px;
+  }
+  .lightbox__nav--next {
+    right: 14px;
+  }
+  .lightbox__nav svg {
+    width: 22px;
+    height: 22px;
+  }
+  .lightbox__nav:hover,
+  .lightbox__nav:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent), 0 0 22px var(--accent-soft);
+    outline: none;
+  }
+  .lightbox__nav--prev:hover {
+    transform: translate(-2px, -50%);
+  }
+  .lightbox__nav--next:hover {
+    transform: translate(2px, -50%);
+  }
+  .lightbox__nav:active {
+    transform: translateY(-50%) scale(0.94);
+  }
+  .lightbox:global(.is-single) .lightbox__nav,
+  .lightbox:global(.is-single) .lightbox__count {
+    display: none;
+  }
+  @media (max-width: 600px) {
+    .lightbox__nav {
+      width: 40px;
+      height: 40px;
+    }
+    .lightbox__nav--prev {
+      left: 8px;
+    }
+    .lightbox__nav--next {
+      right: 8px;
+    }
   }
   .lightbox__close {
     position: absolute;
@@ -204,24 +296,79 @@ const others = projects.filter((p) => !p.case);
   const dialog = document.getElementById('lightbox') as HTMLDialogElement;
   const imgs = document.getElementById('lightbox-imgs')!;
   const caption = document.getElementById('lightbox-caption')!;
+  const count = document.getElementById('lightbox-count')!;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pad = (n: number) => String(n).padStart(2, '0');
 
-  document.querySelectorAll<HTMLButtonElement>('[data-lightbox]').forEach((box) => {
-    box.addEventListener('click', () => {
-      const slide = box.querySelector<HTMLElement>('.slide.is-active')!;
-      const shots = [...slide.querySelectorAll<HTMLImageElement>('.shot')];
-      imgs.classList.toggle('lightbox__imgs--phones', slide.classList.contains('slide--phones'));
-      imgs.replaceChildren(
-        ...shots.map((s) => {
-          const img = new Image();
-          img.src = s.dataset.full || s.currentSrc;
-          img.alt = s.alt;
-          return img;
-        }),
+  // Açık galeri: hangi vaka kutusu, kaçıncı slayt
+  let box: HTMLElement | null = null;
+  let slides: HTMLElement[] = [];
+  let index = 0;
+
+  const fullSrc = (s: HTMLImageElement) => s.dataset.full || s.currentSrc;
+  // Komşu slaytların büyük hallerini önceden yükle → geçiş anında bekleme olmasın
+  const preload = (i: number) =>
+    slides[(i + slides.length) % slides.length]?.querySelectorAll<HTMLImageElement>('.shot').forEach((s) => {
+      new Image().src = fullSrc(s);
+    });
+
+  function show(i: number, dir = 0) {
+    index = (i + slides.length) % slides.length;
+    const slide = slides[index];
+    const shots = [...slide.querySelectorAll<HTMLImageElement>('.shot')];
+    imgs.classList.toggle('lightbox__imgs--phones', slide.classList.contains('slide--phones'));
+    imgs.replaceChildren(
+      ...shots.map((s) => {
+        const img = new Image();
+        img.src = fullSrc(s);
+        img.alt = s.alt;
+        return img;
+      }),
+    );
+    caption.textContent = slide.dataset.caption!;
+    count.innerHTML = `<b>${pad(index + 1)}</b> / ${pad(slides.length)}`;
+    // Kısa kayma + belirme (beklemeden, hemen başlar)
+    if (dir && !reduce)
+      imgs.animate(
+        [{ opacity: 0.35, transform: `translateX(${dir * 28}px)` }, { opacity: 1, transform: 'none' }],
+        { duration: 220, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
       );
-      caption.textContent = slide.dataset.caption!;
+    // Sayfadaki kutu da aynı slayda geçsin (kapatınca kaldığın yerde)
+    box?.querySelector<HTMLButtonElement>(`.thumb[data-index="${index}"]`)?.click();
+    preload(index + 1);
+    preload(index - 1);
+  }
+  const step = (d: number) => slides.length > 1 && show(index + d, d);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-lightbox]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      box = btn.closest('.case');
+      slides = [...btn.querySelectorAll<HTMLElement>('.slide')];
+      dialog.classList.toggle('is-single', slides.length < 2);
+      show(Math.max(0, slides.findIndex((s) => s.classList.contains('is-active'))));
       dialog.showModal();
     });
   });
+
+  dialog.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) =>
+    b.addEventListener('click', () => step(Number(b.dataset.step))),
+  );
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') step(1);
+    else if (e.key === 'ArrowLeft') step(-1);
+    else return;
+    e.preventDefault();
+  });
+  // Dokunmatik: yatay kaydırma ile geçiş
+  let tx = 0;
+  let ty = 0;
+  imgs.addEventListener('touchstart', (e) => ((tx = e.touches[0].clientX), (ty = e.touches[0].clientY)), { passive: true });
+  imgs.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
+  });
+
   dialog.querySelector('.lightbox__close')!.addEventListener('click', () => dialog.close());
   // Arka plana tıklayınca kapat
   dialog.addEventListener('click', (e) => {
