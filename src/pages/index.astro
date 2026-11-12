@@ -12,6 +12,17 @@ import Contact from '../components/Contact.astro';
 ---
 
 <Layout>
+  <!-- F5: ana sayfa en üstten başlar (tarayıcı eski kaydırma konumuna/#bölüme dönmez). Geri tuşu ve /projects'ten "/#about" gibi linkler etkilenmez. -->
+  <script is:inline>
+    (function () {
+      var nav = performance.getEntriesByType('navigation')[0];
+      if (!nav || nav.type !== 'reload') return;
+      history.scrollRestoration = 'manual';
+      if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+      window.scrollTo(0, 0);
+      window.addEventListener('load', function () { window.scrollTo(0, 0); });
+    })();
+  </script>
   <Starfield />
   <Nav />
   <main>

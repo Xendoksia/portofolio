@@ -58,3 +58,4 @@
   - Repo linki `Spotify-Track-Ur-Playlist` (README'deki `Spotify-Follow-Ur-List` GitHub'da 404).
 - **Commit edilmedi:** `/projects` sayfası, CaseStudy/ProjectCard bileşenleri, proje görselleri, içerik düzeltmeleri (GPT-2, RAG, TTS takım projesi), sıralama. Son commit: `c6433aa İlk sürüm`.
 - Açık soru: AutoRate "Caption BLEU 20–25%" metriği README'deki LSTM sürümünden; GPT-2 sürümünün skoru farklıysa güncelle/kaldır.
+- **F5 ana sayfada en üstten başlar** (`index.astro` başındaki inline script; yalnızca `reload` türü gezinmede, `#bölüm` adresten silinir). `/projects`'ten `/#about` linkleri ve `/projects` sayfasının kendi F5'i etkilenmez. Gerçek Chrome'da test edildi.
