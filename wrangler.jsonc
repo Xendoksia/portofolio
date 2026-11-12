@@ -1,0 +1,8 @@
+// Cloudflare Workers ayarı: site statik, dist/ klasörü olduğu gibi yayınlanır (build: npm run build)
+{
+  "name": "deniz-kanlicalioglu",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}
