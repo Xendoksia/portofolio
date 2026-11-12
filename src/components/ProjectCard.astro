@@ -1,0 +1,129 @@
+---
+// Proje kartı: ana sayfada (büyük + küçük) ve /projects sayfasında (küçük) kullanılır.
+import type { Project } from '../data/content';
+
+interface Props {
+  project: Project;
+  big?: boolean;
+  num?: number;
+}
+
+const { project: p, big = false, num } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<a class:list={['card', 'pcard', { 'pcard--big': big }]} href={p.repo} target="_blank" rel="noopener" data-reveal data-glow>
+  {num !== undefined && <span class="pcard__num mono">{pad(num)}</span>}
+  <span class="pcard__kind mono">{p.kind}</span>
+  <h3>{p.title}</h3>
+  <p>{p.description}</p>
+  <div class="pcard__tags">
+    {(big ? p.tags : p.tags.slice(0, 4)).map((t) => <span class="chip">{t}</span>)}
+  </div>
+  {
+    big && (
+      <span class="pcard__link mono">
+        View on GitHub
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 17 17 7M8 7h9v9" />
+        </svg>
+      </span>
+    )
+  }
+</a>
+
+<style>
+  .pcard {
+    --mx: 50%;
+    --my: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px;
+    text-decoration: none;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  /* transform geçişi giriş animasyonu bittikten sonra açılır (GSAP ile çakışmasın) */
+  .pcard.is-in {
+    transition: border-color 0.3s, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  /* İmleci takip eden ışık */
+  .pcard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(360px circle at var(--mx) var(--my), var(--accent-soft), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+  }
+  .pcard:hover {
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+    transform: translateY(-4px);
+  }
+  .pcard:hover::before {
+    opacity: 1;
+  }
+  .pcard > * {
+    position: relative;
+  }
+  .pcard--big {
+    padding: 30px 28px;
+    min-height: 380px;
+  }
+  .pcard__num {
+    font-size: 13px;
+    color: var(--accent);
+  }
+  .pcard__kind {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .pcard h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  .pcard--big h3 {
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+  }
+  .pcard p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .pcard__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 10px;
+  }
+  .pcard__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text);
+    margin-top: 8px;
+  }
+  .pcard__link svg {
+    width: 15px;
+    height: 15px;
+    transition: transform 0.3s;
+  }
+  .pcard:hover .pcard__link svg {
+    transform: translate(3px, -3px);
+  }
+  @media (max-width: 960px) {
+    .pcard--big {
+      min-height: 0;
+    }
+  }
+</style>

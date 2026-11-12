@@ -6,9 +6,11 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 const animate = document.documentElement.classList.contains('anim');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+// Bu script hem ana sayfada hem /projects'te çalışır; sayfada olmayan öğeler için animasyon kurma
+const has = (sel: string) => document.querySelector(sel) !== null;
 
 /* ---------- Hero girişi ---------- */
-if (animate) {
+if (animate && has('[data-hero]')) {
   const tl = gsap.timeline({ defaults: { ease: 'power4.out' }, delay: 0.25 });
   tl.to('[data-hero="intro"]', { opacity: 1, duration: 1.2, ease: 'power2.out' })
     .to('.hero__line .char', { y: 0, duration: 1.1, stagger: 0.035 }, '-=0.5')
@@ -46,7 +48,7 @@ if (animate) {
   });
 
   // Hakkımda metni: eğik perspektiften düzleşerek gelir
-  gsap.to('[data-crawl]', {
+  if (has('[data-crawl]')) gsap.to('[data-crawl]', {
     rotateX: 0,
     y: 0,
     opacity: 1,
@@ -56,7 +58,7 @@ if (animate) {
   });
 
   // Deneyim çizgisi scroll ile dolar
-  gsap.to('[data-beam]', {
+  if (has('[data-beam]')) gsap.to('[data-beam]', {
     scaleY: 1,
     ease: 'none',
     scrollTrigger: { trigger: '[data-timeline]', start: 'top 70%', end: 'bottom 60%', scrub: true },
@@ -135,6 +137,7 @@ if (animate) {
       'wheel',
       (e) => {
         if (e.ctrlKey) return; // zoom
+        if (document.querySelector('dialog[open]')) return; // lightbox açıkken sayfayı kaydırma
         if (traveling) {
           e.preventDefault();
           return;

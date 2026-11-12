@@ -1,0 +1,230 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Starfield from '../components/Starfield.astro';
+import Nav from '../components/Nav.astro';
+import CaseStudy from '../components/CaseStudy.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import Contact from '../components/Contact.astro';
+import { projects, profile } from '../data/content';
+
+const cases = projects.filter((p) => p.case).sort((a, b) => a.case!.order - b.case!.order);
+const others = projects.filter((p) => !p.case);
+---
+
+<Layout
+  title={`Projects — ${profile.name}`}
+  description="Detailed case studies of my AI, computer vision and NLP projects, plus smaller experiments."
+>
+  <Starfield />
+  <Nav base="/" active="projects" />
+  <main>
+    <section class="phead" id="top">
+      <div class="container">
+        <a class="phead__back mono" href="/#projects" data-reveal>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>
+          Back to home
+        </a>
+        <p class="section-label" data-reveal>Episode III · Projects</p>
+        <h1 class="phead__title" data-reveal>Mission archive.</h1>
+        <p class="phead__intro" data-reveal>
+          A closer look at the projects I'm proudest of: the problem, what I built, and the numbers behind it.
+          Smaller experiments are further down.
+        </p>
+      </div>
+    </section>
+
+    {
+      cases.map((p, i) => (
+        <section class="case-section">
+          <div class="container">
+            <CaseStudy project={p} num={i + 1} flip={i % 2 === 1} />
+          </div>
+        </section>
+      ))
+    }
+
+    <section id="more">
+      <div class="container">
+        <p class="section-label" data-reveal>Side missions</p>
+        <h2 class="section-title" data-reveal>More projects.</h2>
+        <div class="others">
+          {others.map((p) => <ProjectCard project={p} />)}
+        </div>
+        <div class="more" data-reveal>
+          <a class="btn" href={profile.github} target="_blank" rel="noopener" data-magnetic>
+            More on GitHub
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"></path></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <Contact />
+  </main>
+
+  <!-- Fotoğraf kutusuna tıklayınca açılan büyük görünüm -->
+  <dialog class="lightbox" id="lightbox" aria-label="Screenshot">
+    <button class="lightbox__close" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+    </button>
+    <div class="lightbox__imgs" id="lightbox-imgs"></div>
+    <p class="lightbox__caption" id="lightbox-caption"></p>
+  </dialog>
+</Layout>
+
+<style>
+  .phead {
+    padding-block: clamp(130px, 18vw, 190px) clamp(40px, 6vw, 70px);
+  }
+  .phead__back {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 34px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.25s;
+  }
+  .phead__back:hover {
+    color: var(--text);
+  }
+  .phead__back svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.25s;
+  }
+  .phead__back:hover svg {
+    transform: translateX(-3px);
+  }
+  .phead__title {
+    margin: 0 0 20px;
+    font-size: clamp(2.8rem, 8vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+  .phead__intro {
+    max-width: 600px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 1.08rem;
+  }
+  .case-section {
+    padding-block: clamp(18px, 3vw, 32px);
+  }
+  .others {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .more {
+    display: flex;
+    justify-content: center;
+    margin-top: 44px;
+  }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox {
+    width: min(1400px, 94vw);
+    max-height: 92vh;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--bg-elev);
+    color: var(--text);
+    overflow: hidden;
+  }
+  .lightbox::backdrop {
+    background: rgba(2, 3, 8, 0.82);
+  }
+  .lightbox[open] {
+    animation: lb-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes lb-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  .lightbox__imgs {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    background: var(--bg);
+  }
+  .lightbox__imgs :global(img) {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    max-height: calc(92vh - 56px);
+    object-fit: contain;
+  }
+  /* telefon slaytı: 3 ekran yan yana */
+  .lightbox__imgs:global(.lightbox__imgs--phones) {
+    padding: 16px;
+  }
+  .lightbox__imgs:global(.lightbox__imgs--phones) :global(img) {
+    max-height: calc(92vh - 88px);
+    border-radius: 12px;
+  }
+  .lightbox__caption {
+    margin: 0;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .lightbox__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .lightbox__close svg {
+    width: 18px;
+    height: 18px;
+  }
+  .lightbox__close:hover {
+    border-color: var(--accent);
+  }
+</style>
+
+<script>
+  import '../scripts/animations';
+
+  const dialog = document.getElementById('lightbox') as HTMLDialogElement;
+  const imgs = document.getElementById('lightbox-imgs')!;
+  const caption = document.getElementById('lightbox-caption')!;
+
+  document.querySelectorAll<HTMLButtonElement>('[data-lightbox]').forEach((box) => {
+    box.addEventListener('click', () => {
+      const slide = box.querySelector<HTMLElement>('.slide.is-active')!;
+      const shots = [...slide.querySelectorAll<HTMLImageElement>('.shot')];
+      imgs.classList.toggle('lightbox__imgs--phones', slide.classList.contains('slide--phones'));
+      imgs.replaceChildren(
+        ...shots.map((s) => {
+          const img = new Image();
+          img.src = s.dataset.full || s.currentSrc;
+          img.alt = s.alt;
+          return img;
+        }),
+      );
+      caption.textContent = slide.dataset.caption!;
+      dialog.showModal();
+    });
+  });
+  dialog.querySelector('.lightbox__close')!.addEventListener('click', () => dialog.close());
+  // Arka plana tıklayınca kapat
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+</script>

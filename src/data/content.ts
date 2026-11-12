@@ -98,13 +98,69 @@ export const skills = [
   { group: 'Web & Databases', items: ['React.js', 'Node.js', 'REST APIs', 'PostgreSQL', 'MSSQL'] },
 ];
 
+// Proje görselleri (README'lerden). Astro build sırasında WebP'ye çevirip boyutlandırır.
+import skinai1 from '../assets/projects/skinai-1.png';
+import skinai2 from '../assets/projects/skinai-2.png';
+import autorate1 from '../assets/projects/autorate-1.png';
+import autorate2 from '../assets/projects/autorate-2.png';
+import tts1 from '../assets/projects/tts-1.png';
+import landcover from '../assets/projects/landcover-result.png';
+import type { ImageMetadata } from 'astro';
+
+// Playlist Tracker galerisi: src/assets/projects/playlist/{desktop,mobile}/ klasörlerindeki TÜM görseller otomatik eklenir.
+// Önce masaüstü, sonra telefon; sıra dosya adına göre (01-..., 02-...). Telefon görüntüleri 3'erli slayt olur.
+// Açıklama: aşağıdaki listede varsa oradan, yoksa dosya adından ("03-history-tab.png" → "History tab").
+const playlistCaptions: Record<string, string> = {
+  statistics: 'Listening overview: plays, time, top track and artist',
+  'top-tracks': 'Top tracks with rank changes',
+  'top-artists': 'Top artists',
+  charts: 'Minutes per day and plays by hour',
+  genres: 'Genres and how their share changed',
+  diversity: 'Diversity: the top 5 artists’ share',
+  'album-collage': '3×3 album collage of the period',
+  'track-page': 'Track page',
+  'artist-page': 'Artist page with MusicBrainz bio',
+  playlists: 'Tracked playlists',
+  'monthly-summary': 'Monthly summary: intro slide',
+  'monthly-summary-last': 'Monthly summary: closing overview',
+  artist: 'Artist page: bio, plays per day and top tracks',
+  recent: 'Recently played, recorded from the Spotify app',
+  'how-it-works': 'How it works: API limits explained in the app',
+  'light-theme': 'Light theme',
+  login: 'Google login with Supabase sync, or continue without an account',
+};
+const galleryFrom = (files: Record<string, { default: ImageMetadata }>, phone: boolean) =>
+  Object.entries(files)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([path, mod]) => {
+      const key = path.split('/').pop()!.replace(/\.[^.]+$/, '').replace(/^\d+[-_ ]*/, '');
+      const name = playlistCaptions[key] ?? key.replace(/[-_]+/g, ' ');
+      const where = phone ? 'Android' : 'Desktop';
+      return { src: mod.default, alt: `${where} — ${name.charAt(0).toUpperCase() + name.slice(1)}`, phone };
+    });
+const playlistGallery = [
+  ...galleryFrom(import.meta.glob('../assets/projects/playlist/desktop/*.{png,jpg,jpeg,webp}', { eager: true }), false),
+  ...galleryFrom(import.meta.glob('../assets/projects/playlist/mobile/*.{png,jpg,jpeg,webp}', { eager: true }), true),
+];
+
+// /projects sayfasındaki büyük vaka kutusu. Tüm sayılar ilgili repo README'sinden.
+export type CaseStudy = {
+  order: number; // /projects sayfasındaki sıra (1 = en üstte)
+  summary: string;
+  built: string[];
+  metrics?: { value: string; label: string }[];
+  // phone: dikey telefon görüntüsü — art arda gelenler 3'erli tek slaytta gösterilir
+  images: { src: ImageMetadata; alt: string; phone?: boolean }[];
+};
+
 export type Project = {
   title: string;
   kind: string;
   description: string;
   tags: string[];
   repo: string;
-  featured?: boolean;
+  featured?: boolean; // ana sayfada büyük kart
+  case?: CaseStudy; // /projects sayfasında büyük vaka kutusu
 };
 
 const gh = (repo: string) => `https://github.com/Xendoksia/${repo}`;
@@ -118,6 +174,29 @@ export const projects: Project[] = [
     tags: ['PyTorch', 'TensorFlow', 'U-Net', 'RAG', 'FAISS', 'React'],
     repo: gh('Skin-Disease-AI'),
     featured: true,
+    case: {
+      order: 1,
+      summary:
+        'A web app that supports skin-disease diagnosis. Upload or capture a photo and get a classification, a pixel-level lesion mask, an attention heat-map and a RAG-based dermatology assistant that explains the result.',
+      built: [
+        'Classification model: ImageNet-pretrained MobileNetV2 fine-tuned on 10 skin-disease classes, returning top-5 predictions with confidence scores.',
+        'Segmentation model: U-Net++ with a ResNet-34 encoder, trained with a Dice + BCE loss for precise lesion boundaries.',
+        'Preprocessing pipeline (CLAHE, non-local-means denoising, DullRazor hair removal) that lifted segmentation IoU from 74.2% to 82.7%.',
+        'Edge-based attention heat-map that shows which regions drove the prediction.',
+        'RAG dermatology chatbot: document ingestion, text chunking, embeddings, semantic retrieval with FAISS / ChromaDB and LLM answers grounded in the retrieved sources.',
+        'React + Vite front end and a Flask back end serving the models for real-time inference.',
+      ],
+      metrics: [
+        { value: '92.3%', label: 'Classification accuracy' },
+        { value: '96.1%', label: 'Top-3 accuracy' },
+        { value: '82.7%', label: 'Segmentation IoU' },
+        { value: '30K+', label: 'Training images' },
+      ],
+      images: [
+        { src: skinai2, alt: 'SkinAI results: predicted condition with confidence, attention heat-map, lesion boundary and the dermatology assistant chat' },
+        { src: skinai1, alt: 'SkinAI upload screen with drag-and-drop and camera capture' },
+      ],
+    },
   },
   {
     title: 'AutoRate & Caption',
@@ -127,15 +206,48 @@ export const projects: Project[] = [
     tags: ['PyTorch', 'Transformers', 'ResNet-50', 'ViT', 'GPT-2'],
     repo: gh('Amazon-Product-RatingAndCaptionGeneration-AI'),
     featured: true,
+    case: {
+      order: 3,
+      summary:
+        'Two models that read a product photo: one predicts its 1–5 star rating, the other writes a product caption. Built around my AI internship work at FLO and trained on 63K+ Amazon Fashion images.',
+      built: [
+        'Rating model: ImageNet-pretrained ResNet-50 regressor (~23M parameters) trained with Huber loss for robustness.',
+        'Caption model: ViT-GPT2 encoder-decoder — a Vision Transformer encoder with a fine-tuned GPT-2 decoder that writes context-aware product descriptions.',
+        'Data pipeline: dataset downloader, automatic filtering of missing files, 70/20/10 split and image augmentation.',
+        'Training with mixed precision, early stopping, learning-rate scheduling and gradient clipping on CUDA.',
+        'Desktop test suite that loads both models, analyses an image and keeps an exportable history.',
+      ],
+      metrics: [
+        { value: '63K+', label: 'Product images' },
+        { value: '0.65', label: 'Rating MAE (1–5 scale)' },
+        { value: '20–25%', label: 'Caption BLEU' },
+      ],
+      images: [
+        { src: autorate2, alt: 'Product Analysis Suite predicting a 4.16 / 5 rating and generating a caption for a sweater photo' },
+        { src: autorate1, alt: 'Product Analysis Suite with model loading and analysis history panels' },
+      ],
+    },
   },
   {
     title: 'Emotional Text-to-Speech',
     kind: 'NLP · Speech',
     description:
-      'Fine-tuned BERT for Turkish emotion recognition, then voices every sentence with emotion-conditioned speech synthesis for dubbing and voice-assistant use cases.',
+      'Fine-tuned BERT for Turkish emotion recognition, then voices every sentence with emotion-conditioned speech synthesis for dubbing and voice-assistant use cases. Team project.',
     tags: ['BERT', 'Transformers', 'TTS', 'Python'],
     repo: gh('Sentiment-Analysis-with-TTS'),
     featured: true,
+    case: {
+      order: 5,
+      summary:
+        'Type Turkish text and the app detects the emotion of every sentence, then voices each sentence in a matching tone — a building block for dubbing and expressive voice assistants. Built as a team project.',
+      built: [
+        'Fine-tuned a Turkish BERT model for sentence-level emotion classification with confidence scores.',
+        'Tagged each sentence with its emotion and synthesised emotion-conditioned speech through the ElevenLabs API.',
+        'Merged the sentences into a single WAV file that can be played back or exported.',
+        'Desktop interface built with Tkinter + ttkbootstrap.',
+      ],
+      images: [{ src: tts1, alt: 'Emotion Dubbing App: Turkish input text tagged as anger and converted to a WAV file' }],
+    },
   },
   {
     title: 'Land Cover Segmentation',
@@ -144,14 +256,53 @@ export const projects: Project[] = [
       'Semantic segmentation of satellite imagery into 8 land-cover classes on LoveDA, comparing UNet, DeepLabV3+ and FPN with combined Dice + CE + Focal loss and an interactive test GUI.',
     tags: ['PyTorch', 'DeepLabV3+', 'EfficientNet', 'GUI'],
     repo: gh('LandCover-Semantic-Segmentation-Masker-AI'),
+    case: {
+      order: 4,
+      summary:
+        'Pixel-level land-cover mapping of satellite images into 8 classes — buildings, roads, water, forest, agriculture and more — on the LoveDA dataset.',
+      built: [
+        'Compared UNet, DeepLabV3+ and FPN with EfficientNet, ResNet and MobileNetV3 encoders.',
+        'Combined Dice + Cross-Entropy + Focal loss with class weighting to handle heavily imbalanced classes.',
+        'Speed-optimised setup: UNet + EfficientNet-B2 (~10M parameters) at 384×384 with mixed precision.',
+        'Interactive GUI that shows the prediction, ground truth, overlays and an error map side by side.',
+      ],
+      metrics: [
+        { value: '8', label: 'Land-cover classes' },
+        { value: '0.60', label: 'Mean IoU' },
+        { value: '84%', label: 'Pixel accuracy (UNet + ResNet-34)' },
+      ],
+      images: [
+        { src: landcover, alt: 'Segmentation results: original satellite image, predicted segmentation, ground truth, overlays and error map' },
+      ],
+    },
   },
   {
     title: 'Playlist Tracker',
-    kind: 'Tool',
+    kind: 'Desktop + Android App',
     description:
-      'Keeps the history of your Spotify & YouTube playlists: which track was added, removed or became unplayable — and when.',
-    tags: ['Python', 'Spotify API', 'YouTube API'],
+      'Keeps the history of your Spotify & YouTube playlists and builds your own listening statistics from what you actually play — synced between Windows and Android.',
+    tags: ['Python', 'Flutter', 'Kotlin', 'Supabase', 'SQLite', 'Spotify API', 'YouTube API'],
     repo: gh('Spotify-Track-Ur-Playlist'),
+    case: {
+      order: 2,
+      summary:
+        'Tracks quietly disappear from Spotify playlists and YouTube videos turn into “Deleted video” — with no record of what was there. Wrapped comes once a year and listening data isn’t in the API. Playlist Tracker covers both: a full playlist history and your own listening statistics, on Windows and Android, synced between them.',
+      built: [
+        'Playlist history: every check snapshots each playlist and diffs it with the previous one — added, removed, unplayable or playable again — and removed tracks keep their title, artist and add date. Background checks every 6/12/24 h with a Windows notification.',
+        'Listening statistics without the Spotify API: plays are read from the Windows media session (WinRT) and, on Android, from a Kotlin NotificationListenerService that keeps recording while the app is closed.',
+        'Play-detection rules: a play counts after 30 s, listening time comes from how far the position really moved, and repeats/skips are handled — written once per platform and tested against each other so both show the same numbers.',
+        'Stats for any week, month or year: top 10s with rank changes, minutes per day, plays by hour, genres (MusicBrainz + Wikidata), discoveries, diversity, milestones, album collage, detail pages and a slide-by-slide “Wrapped”-style monthly summary.',
+        'Offline-first sync over Supabase (Postgres + Row Level Security + Google OAuth): local SQLite is the main copy, only changes go up; device-independent UUIDs and a last-change-wins Postgres trigger resolve conflicts.',
+        'Desktop in Python/tkinter (tray, autostart, single .exe via PyInstaller, CLI); mobile in Flutter with platform channels to Kotlin. EN / TR, light / dark themes; secrets never leave the device.',
+      ],
+      metrics: [
+        { value: '16K+', label: 'Lines of Python, Dart & Kotlin' },
+        { value: '2', label: 'Apps: Windows + Android' },
+        { value: '~90', label: 'Commits' },
+        { value: 'EN / TR', label: 'Interface' },
+      ],
+      images: playlistGallery,
+    },
   },
   {
     title: 'Music Genre Classifier',

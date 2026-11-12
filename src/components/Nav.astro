@@ -1,10 +1,19 @@
 ---
 import { nav, profile } from '../data/content';
+
+interface Props {
+  // Alt sayfalarda (örn. /projects) linkler ana sayfaya gider: "/#about"
+  base?: string;
+  // Alt sayfada vurgulanacak menü öğesi
+  active?: string;
+}
+
+const { base = '', active } = Astro.props;
 ---
 
-<header class="nav">
+<header class="nav" data-fixed-active={active ? '' : undefined}>
   <div class="nav__inner container">
-    <a href="#top" class="nav__logo mono" aria-label="Back to top">
+    <a href={base ? '/' : '#top'} class="nav__logo mono" aria-label={base ? 'Home' : 'Back to top'}>
       <span class="nav__dot"></span><span>{profile.firstName}<span class="nav__k">.dev</span></span>
     </a>
 
@@ -13,7 +22,11 @@ import { nav, profile } from '../data/content';
         {
           nav.map((item) => (
             <li>
-              <a href={`#${item.id}`} data-nav={item.id}>
+              <a
+                href={item.id === active ? '#top' : `${base}#${item.id}`}
+                data-nav={item.id}
+                class:list={{ 'is-active': item.id === active }}
+              >
                 <span class="mono">{item.episode}</span>
                 {item.label}
               </a>
@@ -290,7 +303,8 @@ import { nav, profile } from '../data/content';
     },
     { rootMargin: '-45% 0px -50% 0px' },
   );
-  navLinks.forEach((a) => {
+  // Alt sayfada (data-fixed-active) vurgulu öğe sabit kalır; bölüm takibi sadece ana sayfada
+  if (!header.hasAttribute('data-fixed-active')) navLinks.forEach((a) => {
     const section = document.getElementById(a.dataset.nav!);
     if (section) io.observe(section);
   });

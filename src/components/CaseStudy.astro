@@ -1,0 +1,454 @@
+---
+// /projects sayfasındaki büyük vaka kutusu: fotoğraf kutusu + detaylı açıklama.
+// Fotoğraf kutusuna tıklayınca büyük hali açılır (lightbox, projects.astro'da).
+import { Image, getImage } from 'astro:assets';
+import type { Project } from '../data/content';
+
+interface Props {
+  project: Project;
+  num: number;
+  flip?: boolean; // görsel sağda
+}
+
+const { project: p, num, flip = false } = Astro.props;
+const c = p.case!;
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// Slaytlar: yatay görsel tek başına; art arda gelen telefon görüntüleri 3'erli tek slayt
+type Img = (typeof c.images)[number];
+const slides: Img[][] = [];
+for (const img of c.images) {
+  const last = slides[slides.length - 1];
+  if (img.phone && last?.[0].phone && last.length < 3) last.push(img);
+  else slides.push([img]);
+}
+
+// Slayt açıklaması: ortak önek tek sefer ("Android — A · B · C")
+const captionOf = (s: Img[]) => {
+  const parts = s.map((img) => img.alt.split(' — '));
+  const head = parts[0][0];
+  return s.length > 1 && parts.every((p) => p.length === 2 && p[0] === head)
+    ? `${head} — ${parts.map((p) => p[1]).join(' · ')}`
+    : s.map((img) => img.alt).join(' · ');
+};
+
+// Lightbox için büyük sürüm (orijinalden büyük olmaz; telefonlarda genişlik sınırı)
+const full = (img: Img) =>
+  getImage({ src: img.src, width: Math.min(img.src.width, img.phone ? 720 : 1920), format: 'webp', quality: 78 });
+const fulls = await Promise.all(slides.map((s) => Promise.all(s.map(full))));
+---
+
+<article class:list={['case', { 'case--flip': flip }]} data-reveal>
+  <div class="case__media">
+    <button class="shotbox" type="button" data-lightbox aria-label={`Enlarge screenshot: ${p.title}`}>
+      <span class="shotbox__bar" aria-hidden="true">
+        <span></span><span></span><span></span>
+        <em class="mono">{p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}</em>
+      </span>
+      <span class="shotbox__screen">
+        {
+          slides.map((s, i) => (
+            <span class:list={['slide', { 'slide--phones': s[0].phone, 'is-active': i === 0 }]} data-caption={captionOf(s)}>
+              {s.map((img, k) => (
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  width={img.phone ? 360 : 1100}
+                  format="webp"
+                  loading="lazy"
+                  class="shot"
+                  data-full={fulls[i][k].src}
+                />
+              ))}
+            </span>
+          ))
+        }
+      </span>
+      <span class="shotbox__corner shotbox__corner--tl" aria-hidden="true"></span>
+      <span class="shotbox__corner shotbox__corner--br" aria-hidden="true"></span>
+      <span class="shotbox__zoom mono" aria-hidden="true">Click to enlarge</span>
+    </button>
+
+    <p class="case__caption" aria-live="polite">{captionOf(slides[0])}</p>
+
+    {
+      slides.length > 1 && (
+        <div class="thumbs" role="group" aria-label="Screenshots">
+          {slides.map((s, i) => (
+            <button
+              class:list={['thumb', { 'thumb--phones': s[0].phone, 'is-active': i === 0 }]}
+              type="button"
+              data-index={i}
+              data-caption={captionOf(s)}
+              aria-label={`Show screenshot ${i + 1}`}
+            >
+              {s.map((img) => (
+                <Image src={img.src} alt="" width={img.phone ? 80 : 240} format="webp" loading="lazy" />
+              ))}
+            </button>
+          ))}
+        </div>
+      )
+    }
+  </div>
+
+  <div class="case__body">
+    <p class="case__meta mono"><span>{pad(num)}</span>{p.kind}</p>
+    <h2>{p.title}</h2>
+    <p class="case__summary">{c.summary}</p>
+
+    <h3 class="mono">What I built</h3>
+    <ul class="case__built">
+      {c.built.map((b) => <li>{b}</li>)}
+    </ul>
+
+    {
+      c.metrics && (
+        <dl class="case__metrics">
+          {c.metrics.map((m) => (
+            <div>
+              <dt class="mono">{m.label}</dt>
+              <dd>{m.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+
+    <div class="case__tags">
+      {p.tags.map((t) => <span class="chip">{t}</span>)}
+    </div>
+
+    <a class="btn" href={p.repo} target="_blank" rel="noopener" data-magnetic>
+      View on GitHub
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"></path></svg>
+    </a>
+  </div>
+</article>
+
+<style>
+  .case {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+    padding: clamp(24px, 3.5vw, 40px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--bg-elev) 70%, transparent);
+  }
+  .case--flip .case__media {
+    order: 2;
+  }
+
+  /* ---------- Fotoğraf kutusu ---------- */
+  .case__media {
+    position: sticky;
+    top: 90px;
+  }
+  .shotbox {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--bg);
+    overflow: hidden;
+    cursor: zoom-in;
+    text-align: left;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .shotbox:hover {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), 0 18px 50px -20px var(--accent-soft);
+  }
+  .shotbox__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-elev) 85%, transparent);
+  }
+  .shotbox__bar > span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .shotbox__bar > span:first-child {
+    background: var(--accent);
+  }
+  .shotbox__bar em {
+    margin-left: 8px;
+    font-style: normal;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .shotbox__screen {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .slide.is-active {
+    opacity: 1;
+  }
+  .shotbox:hover .slide.is-active {
+    transform: scale(1.025);
+  }
+  .slide :global(.shot) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+  /* Telefon slaytı: 3 dikey ekran yan yana, ortadaki biraz yukarıda */
+  .slide--phones {
+    gap: 4%;
+    padding: 4% 6%;
+    background: radial-gradient(ellipse at 50% 100%, var(--accent-soft), transparent 70%);
+  }
+  .slide--phones :global(.shot) {
+    width: auto;
+    height: 100%;
+    aspect-ratio: 9 / 20;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.7);
+  }
+  .slide--phones :global(.shot:nth-child(2)) {
+    transform: translateY(-3%);
+  }
+  .case__caption {
+    margin: 10px 2px 0;
+    min-height: 1.5em;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  /* HUD köşe işaretleri */
+  .shotbox__corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-color: var(--accent);
+    border-style: solid;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+  .shotbox__corner--tl {
+    top: 40px;
+    left: 10px;
+    border-width: 2px 0 0 2px;
+    transform: translate(6px, 6px);
+  }
+  .shotbox__corner--br {
+    bottom: 10px;
+    right: 10px;
+    border-width: 0 2px 2px 0;
+    transform: translate(-6px, -6px);
+  }
+  .shotbox:hover .shotbox__corner {
+    opacity: 1;
+    transform: none;
+  }
+  .shotbox__zoom {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    border: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .shotbox:hover .shotbox__zoom,
+  .shotbox:focus-visible .shotbox__zoom {
+    opacity: 1;
+  }
+
+  /* Çok görselli galerilerde alt satıra kayar */
+  .thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .thumb {
+    width: 100px;
+    aspect-ratio: 16 / 10;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg);
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.25s, border-color 0.25s;
+  }
+  .thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+  .thumb--phones {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+  }
+  .thumb--phones :global(img) {
+    width: auto;
+    aspect-ratio: 9 / 20;
+    border-radius: 3px;
+  }
+  .thumb:hover,
+  .thumb.is-active {
+    opacity: 1;
+  }
+  .thumb.is-active {
+    border-color: var(--accent);
+  }
+
+  /* ---------- Metin ---------- */
+  .case__meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 0 0 10px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .case__meta span {
+    color: var(--accent);
+    letter-spacing: 0;
+    font-size: 13px;
+  }
+  h2 {
+    margin: 0 0 14px;
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+  .case__summary {
+    margin: 0 0 26px;
+    color: var(--text);
+    font-size: 1.05rem;
+  }
+  h3 {
+    margin: 0 0 12px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .case__built {
+    list-style: none;
+    margin: 0 0 26px;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .case__built li {
+    position: relative;
+    padding-left: 22px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  /* madde işareti: küçük ışın */
+  .case__built li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.78em;
+    width: 12px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .case__metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin: 0 0 24px;
+  }
+  /* dt (etiket) DOM'da önce gelir; column-reverse ile değer üstte görünür */
+  .case__metrics div {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 6px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+  }
+  .case__metrics dd {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--gold);
+  }
+  .case__metrics dt {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .case__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .case {
+      grid-template-columns: 1fr;
+    }
+    .case--flip .case__media {
+      order: 0;
+    }
+    .case__media {
+      position: static;
+    }
+  }
+</style>
+
+<script>
+  // Küçük resme tıklayınca ana slaytı ve açıklamayı değiştir
+  document.querySelectorAll<HTMLElement>('.case').forEach((caseEl) => {
+    const slides = caseEl.querySelectorAll<HTMLElement>('.slide');
+    const thumbs = caseEl.querySelectorAll<HTMLButtonElement>('.thumb');
+    const caption = caseEl.querySelector<HTMLElement>('.case__caption')!;
+    thumbs.forEach((t) =>
+      t.addEventListener('click', () => {
+        const i = Number(t.dataset.index);
+        slides.forEach((s, k) => s.classList.toggle('is-active', k === i));
+        caption.textContent = t.dataset.caption!;
+        thumbs.forEach((b, k) => b.classList.toggle('is-active', k === i));
+      }),
+    );
+  });
+</script>

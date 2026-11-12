@@ -42,3 +42,19 @@
 - Kalite: **tam** (`RES = 1`, `SKIP = 1`). Kullanıcının Opera'sında (RTX 3060) fps normal. Test Chrome'u Intel GPU'da çalıştığı için çok kötü ölçüyordu — perf kararında ölçüt kullanıcının tarayıcısı. Zayıf cihazda kasarsa: önce `RES = 0.75`, sonra `SKIP = 2`.
 - Otomatik kalite "kuralı" (governor) istenmedi, eklenmedi.
 - **Bölüm geçişlerinde ışık hızı efekti kaldırıldı** (kullanıcı isteği; uzun bölüm içinde kaydırmada da tetikleniyordu). Geçişler sadece yumuşak GSAP kaydırması. Scroll itkisi çizgileşme eşiğinin (%60'ı) altında sınırlı → hızlı scroll'da bile ışık hızına geçmez. Hiperuzay yalnızca sayfa açılışında.
+
+## /projects sayfası (12 Kasım, akşam)
+- `src/pages/projects.astro`: başlık + 5 büyük vaka kutusu (`CaseStudy.astro`, her biri ayrı `<section>` → bölüm atlama vaka vaka çalışır) + kalan projeler küçük kart (`ProjectCard.astro`, ana sayfayla ortak) + Contact. Lightbox: `<dialog>`, Esc/arka plan ile kapanır; açıkken tekerlek sayfayı kaydırmaz.
+- Vaka içeriği `content.ts` → `project.case` (summary, built, metrics, images). Sayılar repo README'lerinden.
+- Görseller `src/assets/projects/` (README'lerden indirildi); Astro build'de WebP'ye çevirir (~4.7 MB PNG → kutu başına 15–60 KB). LandCover GIF'i (4.6 MB, 762 kare) yerine sonuç ekranının tek karesi kullanıldı.
+- Ana sayfa Projects bölümüne "All projects in detail" butonu; Nav alt sayfada `base="/"` + `active` ile çalışır.
+- **Kullanıcı onayladı:** AutoRate caption = ViT + GPT-2 decoder; SkinAI chatbot = RAG (FAISS/ChromaDB); TTS grup projesi (repo fork, ekran görüntüsünde takım arkadaşının dosya yolu normal). Not: AutoRate'teki 'Caption BLEU 20–25%' metriği README'den (LSTM'li sürüm).
+
+## KALDIĞIMIZ YER (12 Kasım, ~21:00)
+- `/projects` vaka sırası `content.ts` → `case.order` ile: 1 SkinAI, 2 Playlist Tracker, 3 AutoRate, 4 LandCover, 5 TTS.
+- **Playlist Tracker vakası (12 Kasım, ~21:15) — README'ye göre yeniden yazıldı:** masaüstü + Android, dinleme istatistikleri, Supabase senkron; metrikler 16K+ satır / 2 uygulama / ~90 commit / EN-TR. Kaynak: `D:\Portfolyo\Playlist-Tracker\README.md`.
+  - Görseller: `src/assets/projects/playlist/desktop/` ve `.../mobile/` (otomatik, dosya adı sırası). Masaüstü önce; **telefon görüntüleri 3'erli tek slayt** (`phone: true`), lightbox'ta yan yana. Açıklamalar `content.ts` → `playlistCaptions`.
+  - Masaüstü görüntüleri eklendi (12 Kasım, ~21:20; kaynak `D:\Portfolyo\Playlist-Tracker\desktop\`): 01-statistics, 02-artist, 03-recent, 04-playlists, 05-how-it-works, 06-light-theme, 07-login. Eski `01-playlist-tracking.png` silindi. Açıklamalar `playlistCaptions`'a eklendi.
+  - Repo linki `Spotify-Track-Ur-Playlist` (README'deki `Spotify-Follow-Ur-List` GitHub'da 404).
+- **Commit edilmedi:** `/projects` sayfası, CaseStudy/ProjectCard bileşenleri, proje görselleri, içerik düzeltmeleri (GPT-2, RAG, TTS takım projesi), sıralama. Son commit: `c6433aa İlk sürüm`.
+- Açık soru: AutoRate "Caption BLEU 20–25%" metriği README'deki LSTM sürümünden; GPT-2 sürümünün skoru farklıysa güncelle/kaldır.
