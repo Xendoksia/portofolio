@@ -109,6 +109,12 @@ section {
   font-weight: 600;
 }
 
+/* Tarafa göre değişen metin: <span class="side-dark">…</span><span class="side-light">…</span> */
+:root[data-theme='dark'] .side-light,
+:root[data-theme='light'] .side-dark {
+  display: none;
+}
+
 /* Butonlar */
 .btn {
   --b: var(--border);

@@ -19,7 +19,9 @@ const year = new Date().getFullYear();
         <>
           <form class="cform card" id="contact-form" data-reveal novalidate>
             <p class="cform__bar mono" aria-hidden="true">
-              <span class="cform__signal"></span>Secure channel <em>· encrypted</em>
+              <span class="cform__signal"></span>
+              <span class="side-dark">Imperial channel <em>· encrypted</em></span>
+              <span class="side-light">Secure channel <em>· Rebel frequency</em></span>
             </p>
             <input type="hidden" name="access_key" value={profile.contactFormKey} />
             <input type="hidden" name="subject" value="New message from your portfolio" />
@@ -43,7 +45,8 @@ const year = new Date().getFullYear();
                 rows="5"
                 required
                 maxlength="5000"
-                placeholder="Help me, Obi-Wan Kenobi. You're my only hope…"></textarea>
+                data-dark="Join me, and together we can rule the galaxy…"
+                data-light="Help me, Obi-Wan Kenobi. You're my only hope…"></textarea>
             </label>
             <div class="cform__foot">
               <p class="cform__status" id="cform-status" role="status" aria-live="polite"></p>
@@ -94,7 +97,8 @@ const year = new Date().getFullYear();
 
   <footer class="footer container mono">
     <span>© {year} {profile.name}</span>
-    <span class="footer__motto">May the code be with you.</span>
+    <span class="footer__motto side-dark">I find your lack of code disturbing.</span>
+    <span class="footer__motto side-light">May the code be with you.</span>
   </footer>
 </section>
 
@@ -369,6 +373,23 @@ const year = new Date().getFullYear();
       status.classList.toggle('is-err', kind === 'err');
     };
 
+    // Tarafa göre değişen metinler (dark side = İmparatorluk, light side = Asiler)
+    const side = () => (document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
+    const SIDE_TEXT = {
+      dark: {
+        ok: "Transmission received. I've been expecting you.",
+        err: 'Signal jammed. Please try again or email me directly.',
+      },
+      light: {
+        ok: "Transmission received. I'll get back to you soon.",
+        err: 'Signal lost. Please try again or email me directly.',
+      },
+    };
+    const message = form.querySelector('textarea')!;
+    const syncSide = () => (message.placeholder = message.dataset[side()]!);
+    syncSide();
+    window.addEventListener('themechange', syncSide);
+
     form.addEventListener('input', (e) => (e.target as HTMLElement).classList.remove('is-invalid'));
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -393,9 +414,9 @@ const year = new Date().getFullYear();
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data.success) throw new Error(data.message || res.statusText);
         form.reset();
-        setStatus("Transmission received. I'll get back to you soon.", 'ok');
+        setStatus(SIDE_TEXT[side()].ok, 'ok');
       } catch {
-        setStatus('Signal lost. Please try again or email me directly.', 'err');
+        setStatus(SIDE_TEXT[side()].err, 'err');
       } finally {
         send.disabled = false;
         sendLabel.textContent = 'Send transmission';
