@@ -4,7 +4,21 @@ import { getContent } from '../data/content';
 import { getLang, langs, switchPath, ui } from '../i18n';
 
 const lang = getLang(Astro.currentLocale);
-const { profile } = getContent(lang);
+const { profile, education } = getContent(lang);
+
+// Google için kim olduğunu anlatan yapılandırılmış veri (isim aramalarında doğru tanınma)
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  jobTitle: ui[lang].metaTitle,
+  description: profile.tagline,
+  url: new URL(lang === 'tr' ? '/tr/' : '/', Astro.site).href,
+  email: `mailto:${profile.email}`,
+  address: { '@type': 'PostalAddress', addressLocality: 'Bolu', addressCountry: 'TR' },
+  alumniOf: education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.school })),
+  sameAs: [profile.github, profile.linkedin],
+};
 
 interface Props {
   title?: string;
@@ -47,6 +61,7 @@ const {
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(person)} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
