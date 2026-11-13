@@ -115,3 +115,13 @@ Açık kalanlar / sıradaki:
 - `hreflang` + `og:locale` (Layout). Form konusu Türkçe sayfadan gelince `(TR)` ekli → hangi dilden yazıldığı görünür.
 - Türkçe tema etiketi uzun ("Karanlık taraf"): kılıç etiketi `nowrap`, 1020 px altında menü link boşluğu 9 px. 360–1440 px ölçüldü, çakışma yok.
 - Proje kimliği `project.id` (İngilizce başlıktan slug) — vaka kutusundaki sahte dosya adı bundan; ileride `/projects#id` linkleri için de kullanılabilir.
+
+## Paylaşım + sitemap (14 Kasım, ~01:00) — canlıda
+- **OG görseli:** `public/og-en.png`, `public/og-tr.png` (1200×630). Şablon `tools/og/og.html`, üretmek için `node tools/og/make-og.mjs` (headless Chrome). İsim/ünvan değişirse yeniden üret. Meta etiketleri `Layout.astro` (og:image, og:url, twitter:card).
+- **Sitemap:** `@astrojs/sitemap` (`astro.config.mjs`, hreflang'li) → `/sitemap-index.xml`; `public/robots.txt`. Alan adı değişirse `site` + robots.txt'deki adres güncellenmeli.
+- **Simgeler:** `apple-touch-icon.png`, `icon-192/512.png`, `site.webmanifest` (`node tools/og/make-icons.mjs`, şablon `tools/og/icon.html`).
+- **JSON-LD Person** (`Layout.astro`): isim, ünvan, okullar, GitHub/LinkedIn.
+- **Lighthouse (14 Kasım, canlı, mobil/masaüstü):** ana sayfa 91/98 perf, /projects 90/97; erişilebilirlik 96–97, best practices 100, SEO 100. Kalan erişilebilirlik kaybı: kırmızı zemin üstü beyaz yazı kontrastı 3.5:1 (aktif dil rozeti, ana düğme) — tasarım kararı, kullanıcı "böyle kalsın" dedi (14 Kasım). Perf'te kalan: Google Fonts CSS'i render'ı bloke ediyor (~800 ms, mobil), /projects görselleri ~390 KB küçültülebilir.
+- **npm audit:** Astro <=7.4.6 orta seviye uyarı (dinamik tag XSS, @astrojs/node — bu sitede ikisi de kullanılmıyor). Düzelten sürümler Node >=22.23.4 istiyor, yerel Node 22.21 → güncellenmedi. Node güncellenirse `npm audit fix`.
+- Projelere doğrudan link ve 404 sayfası: kullanıcı gerek görmedi (14 Kasım), yapılmayacak. İsteğe bağlı: Google Search Console'a sitemap'i göndermek (kullanıcı tarafında).
+- **Kapanış (14 Kasım):** kullanıcı telefonda ve touchpad'de test etti, sorun yok. Cloudflare Worker/Pages silindi. İçerik soruları (Episode etiketleri, "Open a / channel." satır bölünmesi, Network Analysis açıklaması, AutoRate BLEU, Playlist Tracker öne çıkarma) → hepsi olduğu gibi kalıyor. Açık iş: yalnızca Google Search Console (kullanıcı tarafında, isteğe bağlı) ve Node güncellenirse `npm audit fix`.
