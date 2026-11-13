@@ -13,12 +13,53 @@ const year = new Date().getFullYear();
       Looking for an AI / ML engineer, a hackathon teammate, or just want to talk models? My inbox is always open.
     </p>
 
-    <div class="contact__mail" data-reveal>
-      <a class="contact__email" href={`mailto:${profile.email}`}>{profile.email}</a>
-      <button class="btn" type="button" id="copy-email" data-email={profile.email}>
-        <span id="copy-label">Copy</span>
-      </button>
-    </div>
+    {
+      profile.contactFormKey ? (
+        <>
+          <form class="cform card" id="contact-form" data-reveal novalidate>
+            <input type="hidden" name="access_key" value={profile.contactFormKey} />
+            <input type="hidden" name="subject" value="New message from your portfolio" />
+            <input type="hidden" name="from_name" value="Portfolio contact form" />
+            {/* Spam tuzağı: insanlar görmez, botlar doldurur → Web3Forms reddeder */}
+            <input type="checkbox" name="botcheck" class="cform__trap" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <div class="cform__row">
+              <label class="cform__field">
+                <span class="mono">Name</span>
+                <input name="name" type="text" autocomplete="name" required maxlength="100" />
+              </label>
+              <label class="cform__field">
+                <span class="mono">Email</span>
+                <input name="email" type="email" autocomplete="email" required maxlength="200" />
+              </label>
+            </div>
+            <label class="cform__field">
+              <span class="mono">Message</span>
+              <textarea name="message" rows="5" required maxlength="5000"></textarea>
+            </label>
+            <div class="cform__foot">
+              <p class="cform__status" id="cform-status" role="status" aria-live="polite"></p>
+              <button class="btn btn--primary" type="submit" id="cform-send">
+                <span id="cform-label">Send message</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15m0 0-6-6m6 6-6 6"></path></svg>
+              </button>
+            </div>
+          </form>
+          <p class="contact__direct" data-reveal>
+            Prefer email? <a href={`mailto:${profile.email}`}>{profile.email}</a>
+            <button class="contact__copy mono" type="button" id="copy-email" data-email={profile.email}>
+              <span id="copy-label">Copy</span>
+            </button>
+          </p>
+        </>
+      ) : (
+        <div class="contact__mail" data-reveal>
+          <a class="contact__email" href={`mailto:${profile.email}`}>{profile.email}</a>
+          <button class="btn" type="button" id="copy-email" data-email={profile.email}>
+            <span id="copy-label">Copy</span>
+          </button>
+        </div>
+      )
+    }
 
     <ul class="contact__links" data-reveal>
       <li>
@@ -86,6 +127,122 @@ const year = new Date().getFullYear();
   .contact__email:hover {
     background-size: 100% 2px;
   }
+  /* ---------- İletişim formu ---------- */
+  .cform {
+    display: grid;
+    gap: 16px;
+    max-width: 680px;
+    padding: clamp(18px, 3vw, 28px);
+    margin-bottom: 18px;
+  }
+  .cform__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .cform__field {
+    display: grid;
+    gap: 8px;
+  }
+  .cform__field span {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .cform input,
+  .cform textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    font: 400 15px/1.5 'Space Grotesk', sans-serif;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .cform textarea {
+    resize: vertical;
+    min-height: 130px;
+  }
+  .cform input:focus,
+  .cform textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 0 22px var(--accent-soft);
+  }
+  .cform :global(.is-invalid) {
+    border-color: var(--accent);
+  }
+  .cform__trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .cform__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+  }
+  .cform__status {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .cform__status:global(.is-ok) {
+    color: var(--gold);
+  }
+  .cform__status:global(.is-err) {
+    color: var(--accent);
+  }
+  .cform button[disabled] {
+    opacity: 0.6;
+    cursor: wait;
+  }
+  .contact__direct {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 0 0 30px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .contact__direct a {
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+    word-break: break-all;
+  }
+  .contact__direct a:hover {
+    border-color: var(--accent);
+  }
+  .contact__copy {
+    padding: 3px 9px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: none;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .contact__copy:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  @media (max-width: 600px) {
+    .cform__row {
+      grid-template-columns: 1fr;
+    }
+    .cform__foot .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
   .contact__links {
     display: flex;
     flex-wrap: wrap;
@@ -111,6 +268,53 @@ const year = new Date().getFullYear();
 </style>
 
 <script>
+  // ---------- İletişim formu (Web3Forms) ----------
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  if (form) {
+    const status = document.getElementById('cform-status')!;
+    const send = document.getElementById('cform-send') as HTMLButtonElement;
+    const sendLabel = document.getElementById('cform-label')!;
+    const setStatus = (text: string, kind: '' | 'ok' | 'err' = '') => {
+      status.textContent = text;
+      status.classList.toggle('is-ok', kind === 'ok');
+      status.classList.toggle('is-err', kind === 'err');
+    };
+
+    form.addEventListener('input', (e) => (e.target as HTMLElement).classList.remove('is-invalid'));
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fields = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]')];
+      const bad = fields.filter((f) => !f.value.trim() || !f.checkValidity());
+      fields.forEach((f) => f.classList.toggle('is-invalid', bad.includes(f)));
+      if (bad.length) {
+        setStatus(bad[0].type === 'email' && bad[0].value ? 'Please enter a valid email.' : 'Please fill in all fields.', 'err');
+        bad[0].focus();
+        return;
+      }
+
+      send.disabled = true;
+      sendLabel.textContent = 'Sending…';
+      setStatus('');
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success) throw new Error(data.message || res.statusText);
+        form.reset();
+        setStatus("Message sent. I'll get back to you soon.", 'ok');
+      } catch {
+        setStatus("Couldn't send. Please try again or email me directly.", 'err');
+      } finally {
+        send.disabled = false;
+        sendLabel.textContent = 'Send message';
+      }
+    });
+  }
+
+  // ---------- E-postayı kopyala ----------
   const btn = document.getElementById('copy-email') as HTMLButtonElement;
   const label = document.getElementById('copy-label')!;
   btn.addEventListener('click', async () => {

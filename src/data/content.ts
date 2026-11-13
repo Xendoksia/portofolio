@@ -10,6 +10,9 @@ export const profile = {
   github: 'https://github.com/Xendoksia',
   linkedin: 'https://www.linkedin.com/in/deniz-kanl%C4%B1cal%C4%B1o%C4%9Flu',
   cv: '/Deniz_Kanlicalioglu_CV.pdf',
+  // İletişim formu: web3forms.com erişim anahtarı (herkese açık olabilir, mesajları e-postana iletir).
+  // Boşsa form gösterilmez, sadece e-posta adresi görünür.
+  contactFormKey: '18e7a727-9359-4bab-9a07-735280e74adc',
   tagline:
     'I build AI systems end to end — from raw data and feature engineering to trained, fine-tuned and deployed deep learning models.',
   summary: [
