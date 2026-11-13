@@ -10,13 +10,17 @@ const year = new Date().getFullYear();
       Open a <span>channel</span>.
     </h2>
     <p class="contact__text" data-reveal>
-      Looking for an AI / ML engineer, a hackathon teammate, or just want to talk models? My inbox is always open.
+      Looking for an AI / ML engineer, a hackathon teammate, or just want to talk models? Send a transmission below.
+      It lands straight in my inbox.
     </p>
 
     {
       profile.contactFormKey ? (
         <>
           <form class="cform card" id="contact-form" data-reveal novalidate>
+            <p class="cform__bar mono" aria-hidden="true">
+              <span class="cform__signal"></span>Secure channel <em>· encrypted</em>
+            </p>
             <input type="hidden" name="access_key" value={profile.contactFormKey} />
             <input type="hidden" name="subject" value="New message from your portfolio" />
             <input type="hidden" name="from_name" value="Portfolio contact form" />
@@ -34,18 +38,23 @@ const year = new Date().getFullYear();
             </div>
             <label class="cform__field">
               <span class="mono">Message</span>
-              <textarea name="message" rows="5" required maxlength="5000"></textarea>
+              <textarea
+                name="message"
+                rows="5"
+                required
+                maxlength="5000"
+                placeholder="Help me, Obi-Wan Kenobi. You're my only hope…"></textarea>
             </label>
             <div class="cform__foot">
               <p class="cform__status" id="cform-status" role="status" aria-live="polite"></p>
               <button class="btn btn--primary" type="submit" id="cform-send">
-                <span id="cform-label">Send message</span>
+                <span id="cform-label">Send transmission</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15m0 0-6-6m6 6-6 6"></path></svg>
               </button>
             </div>
           </form>
           <p class="contact__direct" data-reveal>
-            Prefer email? <a href={`mailto:${profile.email}`}>{profile.email}</a>
+            Prefer a direct line? <a href={`mailto:${profile.email}`}>{profile.email}</a>
             <button class="contact__copy mono" type="button" id="copy-email" data-email={profile.email}>
               <span id="copy-label">Copy</span>
             </button>
@@ -134,6 +143,46 @@ const year = new Date().getFullYear();
     max-width: 680px;
     padding: clamp(18px, 3vw, 28px);
     margin-bottom: 18px;
+  }
+  /* Üst çubuk: yanıp sönen sinyal ışığı (sadece opacity → compositor, bedava) */
+  .cform__bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 4px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .cform__bar em {
+    font-style: normal;
+    color: var(--muted);
+  }
+  .cform__signal {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: signal 2.4s ease-in-out infinite;
+  }
+  @keyframes signal {
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cform__signal {
+      animation: none;
+    }
+  }
+  .cform textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.55;
+    font-style: italic;
   }
   .cform__row {
     display: grid;
@@ -235,7 +284,47 @@ const year = new Date().getFullYear();
     border-color: var(--accent);
   }
   @media (max-width: 600px) {
-    .cform__row {
+    /* Üst çubuk: yanıp sönen sinyal ışığı (sadece opacity → compositor, bedava) */
+  .cform__bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 4px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .cform__bar em {
+    font-style: normal;
+    color: var(--muted);
+  }
+  .cform__signal {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: signal 2.4s ease-in-out infinite;
+  }
+  @keyframes signal {
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cform__signal {
+      animation: none;
+    }
+  }
+  .cform textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.55;
+    font-style: italic;
+  }
+  .cform__row {
       grid-template-columns: 1fr;
     }
     .cform__foot .btn {
@@ -293,7 +382,7 @@ const year = new Date().getFullYear();
       }
 
       send.disabled = true;
-      sendLabel.textContent = 'Sending…';
+      sendLabel.textContent = 'Transmitting…';
       setStatus('');
       try {
         const res = await fetch('https://api.web3forms.com/submit', {
@@ -304,12 +393,12 @@ const year = new Date().getFullYear();
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data.success) throw new Error(data.message || res.statusText);
         form.reset();
-        setStatus("Message sent. I'll get back to you soon.", 'ok');
+        setStatus("Transmission received. I'll get back to you soon.", 'ok');
       } catch {
-        setStatus("Couldn't send. Please try again or email me directly.", 'err');
+        setStatus('Signal lost. Please try again or email me directly.', 'err');
       } finally {
         send.disabled = false;
-        sendLabel.textContent = 'Send message';
+        sendLabel.textContent = 'Send transmission';
       }
     });
   }
