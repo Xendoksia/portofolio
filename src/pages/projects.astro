@@ -137,9 +137,13 @@ const others = projects.filter((p) => !p.case);
   }
 
   /* ---------- Lightbox ---------- */
+  /* Sabit yükseklik (geçişte pencere boyu ve oklar zıplamaz); görsel alanı açıklamadan kalan yeri alır,
+     açıklama kaç satır olursa olsun kesilmez. dvh: mobilde adres çubuğu hariç gerçek görünür yükseklik */
   .lightbox {
     width: min(1400px, 94vw);
-    max-height: 92vh;
+    height: 92vh;
+    height: 92dvh;
+    max-height: none;
     padding: 0;
     border: 1px solid var(--border);
     border-radius: 16px;
@@ -147,11 +151,13 @@ const others = projects.filter((p) => !p.case);
     color: var(--text);
     overflow: hidden;
   }
+  .lightbox[open] {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    animation: lb-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
   .lightbox::backdrop {
     background: rgba(2, 3, 8, 0.82);
-  }
-  .lightbox[open] {
-    animation: lb-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   @keyframes lb-in {
     from {
@@ -159,20 +165,24 @@ const others = projects.filter((p) => !p.case);
       transform: scale(0.96);
     }
   }
-  /* Sabit yükseklik: geçişte pencere boyu ve oklar zıplamaz */
+  .lightbox__stage {
+    position: relative;
+    min-height: 0;
+  }
   .lightbox__imgs {
+    position: absolute;
+    inset: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 16px;
-    height: calc(92vh - 56px);
     background: var(--bg);
   }
   .lightbox__imgs :global(img) {
     display: block;
     min-width: 0;
     max-width: 100%;
-    max-height: calc(92vh - 56px);
+    max-height: 100%;
     object-fit: contain;
   }
   /* telefon slaytı: 3 ekran yan yana */
@@ -180,11 +190,34 @@ const others = projects.filter((p) => !p.case);
     padding: 16px;
   }
   .lightbox__imgs:global(.lightbox__imgs--phones) :global(img) {
-    max-height: calc(92vh - 88px);
     border-radius: 12px;
   }
-  .lightbox__stage {
-    position: relative;
+  /* Dik telefon ekranı: pencere içeriği kadar uzar (yatay görselin altında/üstünde boş alan kalmaz) */
+  @media (orientation: portrait) and (max-width: 700px) {
+    .lightbox {
+      height: fit-content; /* auto, modal dialog'da ekranı doldurur */
+      max-height: 92dvh;
+    }
+    .lightbox[open] {
+      grid-template-rows: auto auto;
+    }
+    .lightbox__imgs {
+      position: static;
+      gap: 8px;
+      padding-top: 64px; /* kapatma düğmesi görselin üstüne binmesin */
+    }
+    .lightbox__imgs :global(img) {
+      max-height: calc(92dvh - 220px);
+    }
+    .lightbox__imgs:global(.lightbox__imgs--phones) {
+      padding: 64px 10px 12px;
+    }
+    .lightbox__imgs:global(.lightbox__imgs--phones) :global(img) {
+      border-radius: 8px;
+    }
+    .lightbox__caption {
+      font-size: 13px;
+    }
   }
   .lightbox__foot {
     display: flex;
@@ -269,6 +302,7 @@ const others = projects.filter((p) => !p.case);
   }
   .lightbox__close {
     position: absolute;
+    z-index: 2; /* görsel katmanının üstünde kalsın */
     top: 12px;
     right: 12px;
     width: 40px;

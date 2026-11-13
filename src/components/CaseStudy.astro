@@ -42,7 +42,6 @@ const fulls = await Promise.all(slides.map((s) => Promise.all(s.map(full))));
   <div class="case__media">
     <button class="shotbox" type="button" data-lightbox aria-label={`Enlarge screenshot: ${p.title}`}>
       <span class="shotbox__bar" aria-hidden="true">
-        <span></span><span></span><span></span>
         <em class="mono">{p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}</em>
       </span>
       <span class="shotbox__screen">
@@ -172,17 +171,7 @@ const fulls = await Promise.all(slides.map((s) => Promise.all(s.map(full))));
     border-bottom: 1px solid var(--border);
     background: color-mix(in srgb, var(--bg-elev) 85%, transparent);
   }
-  .shotbox__bar > span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border);
-  }
-  .shotbox__bar > span:first-child {
-    background: var(--accent);
-  }
   .shotbox__bar em {
-    margin-left: 8px;
     font-style: normal;
     font-size: 11px;
     color: var(--muted);
