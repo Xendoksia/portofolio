@@ -27,7 +27,6 @@ const { base = '', active } = Astro.props;
                 data-nav={item.id}
                 class:list={{ 'is-active': item.id === active }}
               >
-                <span class="mono">{item.episode}</span>
                 {item.label}
               </a>
             </li>
@@ -96,7 +95,6 @@ const { base = '', active } = Astro.props;
   }
   .nav__links a {
     display: inline-flex;
-    gap: 7px;
     align-items: baseline;
     padding: 8px 12px;
     border-radius: 999px;
@@ -104,11 +102,6 @@ const { base = '', active } = Astro.props;
     color: var(--muted);
     text-decoration: none;
     transition: color 0.25s, background 0.25s;
-  }
-  .nav__links a .mono {
-    font-size: 10px;
-    color: var(--gold);
-    opacity: 0.8;
   }
   .nav__links a:hover,
   .nav__links a.is-active {

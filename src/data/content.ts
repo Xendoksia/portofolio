@@ -335,10 +335,10 @@ export const projects: Project[] = [
 ];
 
 export const nav = [
-  { id: 'about', label: 'About', episode: 'I' },
-  { id: 'experience', label: 'Experience', episode: 'II' },
-  { id: 'projects', label: 'Projects', episode: 'III' },
-  { id: 'skills', label: 'Skills', episode: 'IV' },
-  { id: 'education', label: 'Education', episode: 'V' },
-  { id: 'contact', label: 'Contact', episode: 'VI' },
+  { id: 'about', label: 'About' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'education', label: 'Education' },
+  { id: 'contact', label: 'Contact' },
 ];
