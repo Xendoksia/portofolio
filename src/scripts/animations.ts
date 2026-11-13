@@ -23,6 +23,20 @@ if (animate && has('[data-hero]')) {
     );
 }
 
+/* ---------- Temiz adres çubuğu ----------
+   Başka sayfadan "/#about" gibi bir linkle gelinince bölüme git ve adresi "/" olarak bırak */
+if (location.hash) {
+  const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  history.replaceState(null, '', location.pathname + location.search);
+  if (el) {
+    const go = () => window.scrollTo(0, Math.max(0, el.offsetTop - 40)); // section { scroll-margin-top }
+    go();
+    const y0 = window.scrollY;
+    // Resimler/yazı tipleri yüklenince yerleşim kayabilir; kullanıcı bu arada kaydırmadıysa yeniden hizala
+    window.addEventListener('load', () => Math.abs(window.scrollY - y0) < 2 && go(), { once: true });
+  }
+}
+
 /* ---------- Scroll ile beliren öğeler ---------- */
 if (animate) {
   ScrollTrigger.batch('[data-reveal]', {
@@ -172,8 +186,7 @@ if (animate) {
       const id = a.getAttribute('href')!.slice(1);
       const target = id === 'top' ? document.body : document.getElementById(id);
       if (!target) return;
-      e.preventDefault();
-      history.replaceState(null, '', id === 'top' ? ' ' : `#${id}`);
+      e.preventDefault(); // adres çubuğu temiz kalsın (#about eklenmez)
       travelTo(id === 'top' ? 0 : topOf(target as HTMLElement));
     });
   });
