@@ -19,8 +19,10 @@ const other = lang === 'en' ? 'tr' : 'en';
 
 <header class="nav" data-fixed-active={active ? '' : undefined} data-email={profile.email} data-github={profile.github}>
   <div class="nav__inner container">
-    <a href={sub ? home : '#top'} class="nav__logo mono" aria-label={sub ? t.home : t.top}>
+    <a href={sub ? home : '#top'} class="nav__logo mono">
       <span class="nav__dot"></span><span>{profile.firstName}<span class="nav__k">.dev</span></span>
+      {/* Ekran okuyucu için açıklama; görünen metin erişilebilir adın başında kalsın (Lighthouse) */}
+      <span class="sr">{sub ? t.home : t.top}</span>
     </a>
 
     <nav aria-label={t.main}>
@@ -48,9 +50,9 @@ const other = lang === 'en' ? 'tr' : 'en';
         href={switchPath(Astro.url.pathname, other)}
         hreflang={other}
         lang={other}
-        aria-label={ui[lang].switchTo}
       >
         <span class:list={{ 'is-on': lang === 'en' }}>EN</span><span class:list={{ 'is-on': lang === 'tr' }}>TR</span>
+        <span class="sr">{ui[lang].switchTo}</span>
       </a>
       <button class="saber" id="theme-toggle" type="button" aria-label={t.theme}>
         <span class="saber__label mono" id="theme-label">{t.dark}</span>
@@ -84,6 +86,16 @@ const other = lang === 'en' ? 'tr' : 'en';
     justify-content: space-between;
     gap: 20px;
   }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    padding: 0 !important;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   .nav__logo {
     display: inline-flex;
     align-items: center;
