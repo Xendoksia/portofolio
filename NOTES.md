@@ -89,3 +89,19 @@
 - **Commit akışı (kullanıcı onayı):** "commit et" denince doğrudan `main`'e commit + push → birkaç dakikada canlı. Push'tan önce yerelde `npm run build` + tarayıcıda kontrol.
 - Cloudflare'deki eski Worker/Pages projeleri silinmeli (kullanıcı tarafında; silinmediyse her push'ta boşuna build alır).
 - Sıradaki iş: yukarıdaki "SONRA YAPILACAKLAR" → 2 (OG görseli + sitemap/robots), sonra 3–5.
+
+## KALDIĞIMIZ YER (13 Kasım, ~12:35)
+Bugün yapılanlar (hepsi main'de ve canlıda):
+- **Bölüm geçişi karma model** (`animations.ts`): ~1 ekran taşan bölüm iki duraklı (başı + altı), çok uzun bölüm içi doğal kaydırma; touchpad ataleti tek geçiş; geçişte ters yön geri alır. Test: `tools/bench-hybrid.mjs` (7 senaryo).
+- **Temiz adres çubuğu:** menü/sayfa içi linkler `#about` yazmaz; `/projects`'ten `/#about` ile gelince bölüme gidilip adres `/` yapılır.
+- **Lightbox mobil düzeltmesi:** açıklama kesilmiyor (grid + dvh), dik telefonda içerik kadar; X düğmesi görselin altında kalıp tıklanmıyordu → düzeltildi. Fotoğraf kutusundaki 3 nokta kaldırıldı.
+- **Menüdeki I–VI numaraları kaldırıldı** (bölüm etiketlerindeki "Episode …" duruyor; sadeleştirme önerildi, cevap bekliyor).
+- **İletişim formu (Web3Forms):** anahtar `content.ts` → `contactFormKey` (herkese açık olabilir; kötüye kullanılırsa web3forms panelinden yenile). Kullanıcı mailin geldiğini doğruladı. Masaüstünde iki sütun, bölüm + footer tek ekrana sığar (1366×768'e kadar).
+- **Dark/light side'a göre değişen detaylar:** `.side-dark` / `.side-light` sınıfları (`global.css`). Hero cümlesi, form çubuğu + Vader/Leia ipucu metni, gönderim mesajları, footer sözü, e-posta kopyalama, sekmeden çıkınca başlık, konsol mesajı (`Nav.astro`).
+
+Açık kalanlar / sıradaki:
+- 404 sayfası (önerildi, seçilmedi): "These aren't the pages you're looking for." / dark: "I find your lack of a valid URL disturbing."
+- "Episode III · Projects" gibi bölüm etiketlerini sadeleştirme (soruldu, cevap yok).
+- İki sütunda "Open a / channel." bazı genişliklerde iki satıra bölünüyor (kullanıcıya soruldu).
+- Touchpad'li gerçek cihazda bölüm geçişi hissi kullanıcıdan teyit bekliyor.
+- Yukarıdaki "SONRA YAPILACAKLAR" 2–5 (OG görseli, sitemap/robots, Lighthouse, telefon testi, içerik soruları) hâlâ geçerli.
