@@ -30,7 +30,7 @@ const profileData = {
   summary: [
     {
       en: "I'm a Computer Engineering graduate from Düzce University (100% English program), now doing my M.Sc. in Computer Engineering, with an Erasmus+ semester at Gdańsk University of Technology behind me.",
-      tr: 'Düzce Üniversitesi Bilgisayar Mühendisliği (%100 İngilizce) mezunuyum; şu an Bilgisayar Mühendisliği yüksek lisansı yapıyorum ve geride Gdańsk Teknik Üniversitesi’nde bir Erasmus+ dönemi var.',
+      tr: 'Düzce Üniversitesi Bilgisayar Mühendisliği (%100 İngilizce) mezunuyum. Şu anda Bolu Abant İzzet Baysal Üniversitesi’nde Bilgisayar Mühendisliği yüksek lisansımı yapıyorum; lisans sırasında Gdańsk Teknik Üniversitesi’nde bir Erasmus+ dönemi geçirdim.',
     },
     {
       en: 'I enjoy building AI systems end to end: preparing data, engineering features, training and fine-tuning Machine Learning and Deep Learning models in Python with PyTorch and TensorFlow, and getting them deployed.',
