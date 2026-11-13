@@ -11,7 +11,7 @@ interface Props {
 const { base = '', active } = Astro.props;
 ---
 
-<header class="nav" data-fixed-active={active ? '' : undefined}>
+<header class="nav" data-fixed-active={active ? '' : undefined} data-email={profile.email} data-github={profile.github}>
   <div class="nav__inner container">
     <a href={base ? '/' : '#top'} class="nav__logo mono" aria-label={base ? 'Home' : 'Back to top'}>
       <span class="nav__dot"></span><span>{profile.firstName}<span class="nav__k">.dev</span></span>
@@ -229,6 +229,31 @@ const { base = '', active } = Astro.props;
   const label = document.getElementById('theme-label')!;
   const menuBtn = document.getElementById('menu-toggle') as HTMLButtonElement;
   const links = document.getElementById('nav-links')!;
+
+  const isLight = () => root.dataset.theme === 'light';
+
+  // ---------- Sekmeden ayrılınca başlık tarafa göre değişir ----------
+  const baseTitle = document.title;
+  document.addEventListener('visibilitychange', () => {
+    document.title = document.hidden
+      ? isLight()
+        ? 'Come back, Padawan…'
+        : 'Come back to the dark side…'
+      : baseTitle;
+  });
+
+  // ---------- Konsola bakanlara küçük bir mesaj ----------
+  {
+    const accent = isLight() ? '#4ea3ff' : '#ff3b3b';
+    const [head, body] = isLight()
+      ? ['The Force is strong with this one.', "You found the console. Let's build something together."]
+      : ['Impressive. Most impressive.', 'You found the console. Now find my inbox.'];
+    console.log(
+      `%c${head}%c\n${body}\n\n✉  ${header.dataset.email}\n⌥  ${header.dataset.github}`,
+      `font: 600 16px/1.6 sans-serif; color: ${accent}`,
+      'font: 13px/1.6 monospace; color: inherit',
+    );
+  }
 
   const labelFor = (t: string) => (t === 'dark' ? 'Dark side' : 'Light side');
   label.textContent = labelFor(root.dataset.theme || 'dark');

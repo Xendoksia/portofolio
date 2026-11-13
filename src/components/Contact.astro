@@ -430,7 +430,8 @@ const year = new Date().getFullYear();
   btn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(btn.dataset.email!);
-      label.textContent = 'Copied ✓';
+      label.textContent =
+        document.documentElement.dataset.theme === 'light' ? 'Copied. The Force is with you.' : 'Copied. As I have foreseen.';
     } catch {
       label.textContent = 'Copy failed';
     }
