@@ -29,7 +29,7 @@ const profileData = {
   },
   summary: [
     {
-      en: "I'm a Computer Engineering graduate from Düzce University (100% English program), now doing my M.Sc. in Computer Engineering, with an Erasmus+ semester at Gdańsk University of Technology behind me.",
+      en: "I'm a Computer Engineering graduate from Düzce University (100% English program), now doing my M.Sc. in Computer Engineering at Bolu Abant İzzet Baysal University, with an Erasmus+ semester at Gdańsk University of Technology behind me.",
       tr: 'Düzce Üniversitesi Bilgisayar Mühendisliği (%100 İngilizce) mezunuyum. Şu anda Bolu Abant İzzet Baysal Üniversitesi’nde Bilgisayar Mühendisliği yüksek lisansımı yapıyorum; lisans sırasında Gdańsk Teknik Üniversitesi’nde bir Erasmus+ dönemi geçirdim.',
     },
     {
