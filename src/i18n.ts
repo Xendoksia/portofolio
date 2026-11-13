@@ -133,7 +133,7 @@ const tr: UI = {
     github: 'ya da hepsine GitHub’da göz atın',
   },
   card: { github: 'GitHub’da gör' },
-  skills: { label: 'Bölüm IV · Yetenekler', title: 'Alet çantası.' },
+  skills: { label: 'Bölüm IV · Yetenekler', title: 'The toolkit.' },
   education: {
     label: 'Bölüm V · Eğitim',
     title: 'Akademi yılları.',
