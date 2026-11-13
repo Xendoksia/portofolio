@@ -4,65 +4,59 @@ const year = new Date().getFullYear();
 ---
 
 <section id="contact" class="contact">
-  <div class="container">
-    <p class="section-label" data-reveal>Episode VI · Contact</p>
-    <h2 class="contact__title" data-reveal>
-      Open a <span>channel</span>.
-    </h2>
-    <p class="contact__text" data-reveal>
-      Looking for an AI / ML engineer, a hackathon teammate, or just want to talk models? Send a transmission below.
-      It lands straight in my inbox.
-    </p>
+  <div class="container contact__grid">
+    <div class="contact__intro">
+      <p class="section-label" data-reveal>Episode VI · Contact</p>
+      <h2 class="contact__title" data-reveal>
+        Open a <span>channel</span>.
+      </h2>
+      <p class="contact__text" data-reveal>
+        Looking for an AI / ML engineer, a hackathon teammate, or just want to talk models? Send a transmission and it
+        lands straight in my inbox.
+      </p>
+    </div>
 
     {
       profile.contactFormKey ? (
-        <>
-          <form class="cform card" id="contact-form" data-reveal novalidate>
-            <p class="cform__bar mono" aria-hidden="true">
-              <span class="cform__signal"></span>
-              <span class="side-dark">Imperial channel <em>· encrypted</em></span>
-              <span class="side-light">Secure channel <em>· Rebel frequency</em></span>
-            </p>
-            <input type="hidden" name="access_key" value={profile.contactFormKey} />
-            <input type="hidden" name="subject" value="New message from your portfolio" />
-            <input type="hidden" name="from_name" value="Portfolio contact form" />
-            {/* Spam tuzağı: insanlar görmez, botlar doldurur → Web3Forms reddeder */}
-            <input type="checkbox" name="botcheck" class="cform__trap" tabindex="-1" autocomplete="off" aria-hidden="true" />
-            <div class="cform__row">
-              <label class="cform__field">
-                <span class="mono">Name</span>
-                <input name="name" type="text" autocomplete="name" required maxlength="100" />
-              </label>
-              <label class="cform__field">
-                <span class="mono">Email</span>
-                <input name="email" type="email" autocomplete="email" required maxlength="200" />
-              </label>
-            </div>
-            <label class="cform__field">
-              <span class="mono">Message</span>
-              <textarea
-                name="message"
-                rows="5"
-                required
-                maxlength="5000"
-                data-dark="Join me, and together we can rule the galaxy…"
-                data-light="Help me, Obi-Wan Kenobi. You're my only hope…"></textarea>
-            </label>
-            <div class="cform__foot">
-              <p class="cform__status" id="cform-status" role="status" aria-live="polite"></p>
-              <button class="btn btn--primary" type="submit" id="cform-send">
-                <span id="cform-label">Send transmission</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15m0 0-6-6m6 6-6 6"></path></svg>
-              </button>
-            </div>
-          </form>
-          <p class="contact__direct" data-reveal>
-            Prefer a direct line? <a href={`mailto:${profile.email}`}>{profile.email}</a>
-            <button class="contact__copy mono" type="button" id="copy-email" data-email={profile.email}>
-              <span id="copy-label">Copy</span>
-            </button>
+        <form class="cform card" id="contact-form" data-reveal novalidate>
+          <p class="cform__bar mono" aria-hidden="true">
+            <span class="cform__signal"></span>
+            <span class="side-dark">Imperial channel <em>· encrypted</em></span>
+            <span class="side-light">Secure channel <em>· Rebel frequency</em></span>
           </p>
-        </>
+          <input type="hidden" name="access_key" value={profile.contactFormKey} />
+          <input type="hidden" name="subject" value="New message from your portfolio" />
+          <input type="hidden" name="from_name" value="Portfolio contact form" />
+          {/* Spam tuzağı: insanlar görmez, botlar doldurur → Web3Forms reddeder */}
+          <input type="checkbox" name="botcheck" class="cform__trap" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <div class="cform__row">
+            <label class="cform__field">
+              <span class="mono">Name</span>
+              <input name="name" type="text" autocomplete="name" required maxlength="100" />
+            </label>
+            <label class="cform__field">
+              <span class="mono">Email</span>
+              <input name="email" type="email" autocomplete="email" required maxlength="200" />
+            </label>
+          </div>
+          <label class="cform__field">
+            <span class="mono">Message</span>
+            <textarea
+              name="message"
+              rows="5"
+              required
+              maxlength="5000"
+              data-dark="Join me, and together we can rule the galaxy…"
+              data-light="Help me, Obi-Wan Kenobi. You're my only hope…"></textarea>
+          </label>
+          <div class="cform__foot">
+            <p class="cform__status" id="cform-status" role="status" aria-live="polite"></p>
+            <button class="btn btn--primary" type="submit" id="cform-send">
+              <span id="cform-label">Send transmission</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15m0 0-6-6m6 6-6 6"></path></svg>
+            </button>
+          </div>
+        </form>
       ) : (
         <div class="contact__mail" data-reveal>
           <a class="contact__email" href={`mailto:${profile.email}`}>{profile.email}</a>
@@ -73,26 +67,38 @@ const year = new Date().getFullYear();
       )
     }
 
-    <ul class="contact__links" data-reveal>
-      <li>
-        <a class="btn" href={profile.github} target="_blank" rel="noopener" data-magnetic>
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"></path></svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a class="btn" href={profile.linkedin} target="_blank" rel="noopener" data-magnetic>
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6h.1c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2ZM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2ZM7.1 20.5H3.5V9h3.6v11.5ZM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0Z"></path></svg>
-          LinkedIn
-        </a>
-      </li>
-      <li>
-        <a class="btn btn--primary" href={profile.cv} download data-magnetic>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"></path></svg>
-          Download CV
-        </a>
-      </li>
-    </ul>
+    <div class="contact__more">
+      {
+        profile.contactFormKey && (
+          <p class="contact__direct" data-reveal>
+            Prefer a direct line? <a href={`mailto:${profile.email}`}>{profile.email}</a>
+            <button class="contact__copy mono" type="button" id="copy-email" data-email={profile.email}>
+              <span id="copy-label">Copy</span>
+            </button>
+          </p>
+        )
+      }
+      <ul class="contact__links" data-reveal>
+        <li>
+          <a class="btn" href={profile.github} target="_blank" rel="noopener" data-magnetic>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"></path></svg>
+            GitHub
+          </a>
+        </li>
+        <li>
+          <a class="btn" href={profile.linkedin} target="_blank" rel="noopener" data-magnetic>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6h.1c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2ZM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2ZM7.1 20.5H3.5V9h3.6v11.5ZM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0Z"></path></svg>
+            LinkedIn
+          </a>
+        </li>
+        <li>
+          <a class="btn btn--primary" href={profile.cv} download data-magnetic>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"></path></svg>
+            Download CV
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 
   <footer class="footer container mono">
@@ -106,8 +112,56 @@ const year = new Date().getFullYear();
   .contact {
     padding-bottom: 40px;
   }
+  .contact__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'intro form'
+      'more form';
+    column-gap: clamp(40px, 6vw, 96px);
+    align-items: start;
+  }
+  .contact__intro {
+    grid-area: intro;
+  }
+  .contact__grid > :global(.cform),
+  .contact__grid > :global(.contact__mail) {
+    grid-area: form;
+  }
+  .contact__more {
+    grid-area: more;
+  }
+  @media (max-width: 900px) {
+    .contact__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      grid-template-areas: 'intro' 'form' 'more';
+    }
+  }
+  /* Kısa masaüstü ekranı (ör. 1366×768): bölüm + footer tek ekrana sığsın */
+  @media (min-width: 901px) and (max-height: 760px) {
+    .contact {
+      padding-top: 72px;
+    }
+    .contact .contact__title {
+      font-size: 3.4rem;
+    }
+    .contact .contact__text {
+      margin-bottom: 24px;
+    }
+    .contact .cform {
+      gap: 12px;
+    }
+    .contact .cform textarea {
+      min-height: 96px;
+    }
+    .contact .footer {
+      margin-top: 36px;
+    }
+  }
   .contact__title {
-    font-size: clamp(2.6rem, 8vw, 6rem);
+    font-size: clamp(2.6rem, 6vw, 5rem);
     line-height: 1;
     letter-spacing: -0.035em;
     margin: 0 0 22px;
@@ -144,7 +198,6 @@ const year = new Date().getFullYear();
   .cform {
     display: grid;
     gap: 16px;
-    max-width: 680px;
     padding: clamp(18px, 3vw, 28px);
     margin-bottom: 18px;
   }
@@ -261,7 +314,7 @@ const year = new Date().getFullYear();
     flex-wrap: wrap;
     align-items: center;
     gap: 6px 10px;
-    margin: 0 0 30px;
+    margin: 0 0 22px;
     font-size: 14px;
     color: var(--muted);
   }
@@ -349,7 +402,7 @@ const year = new Date().getFullYear();
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 10px;
-    margin-top: clamp(80px, 12vw, 140px);
+    margin-top: clamp(48px, 6vw, 72px);
     padding-top: 26px;
     border-top: 1px solid var(--border);
     font-size: 12px;
