@@ -94,30 +94,70 @@ if (animate && finePointer) {
 }
 
 /* ---------- Bölümden bölüme yolculuk ----------
-   Masaüstünde bir tekerlek hareketi bir sonraki bölümün başına götürür (ışık hızı efekti yok, sadece yumuşak kaydırma).
-   Bölüm ekrandan uzunsa iki durak: önce bölümün altı hizalanır, sonra diğer bölüm (içerik atlanmaz).
+   Karma model: uzun bölümün içinde doğal tarayıcı kaydırması; bölüm sınırına gelince bir tekerlek hareketi
+   yumuşak geçişle komşu bölüme götürür. Tekerlek olayları "hareket" olarak gruplanır (touchpad ataleti tek
+   hareket sayılır, sabit bekleme süresi yok). Geçiş sürerken ters yöne çevirmek geçişi geri alır.
    Dokunmatik ve klavye doğal kalır. */
 if (animate) {
   const OFFSET = 40; // section { scroll-margin-top } ile aynı
+  const GAP = 160; // bu kadar ms olay gelmezse yeni hareket başlar
   const sections = [...document.querySelectorAll<HTMLElement>('main > section')];
   let traveling = false;
-  let cooldownUntil = 0;
+  let travelFrom = 0;
+  let travelTarget = 0;
+  let travelDir = 0;
+  let tween: gsap.core.Tween | null = null;
 
   const topOf = (s: HTMLElement) => Math.max(0, s.offsetTop - OFFSET);
 
-  function travelTo(y: number) {
+  function travelTo(y: number, from = window.scrollY) {
+    if (Math.abs(y - window.scrollY) < 1) return;
+    tween?.kill();
     traveling = true;
+    travelFrom = from;
+    travelTarget = y;
+    travelDir = Math.sign(y - from);
     const dist = Math.abs(y - window.scrollY);
-    const duration = Math.min(1.3, 0.6 + dist / 2500);
-    gsap.to(window, {
+    tween = gsap.to(window, {
       scrollTo: { y, autoKill: false },
-      duration,
+      duration: Math.min(1.3, 0.6 + dist / 2500),
       ease: 'power3.inOut',
       onComplete() {
         traveling = false;
-        cooldownUntil = performance.now() + 350; // trackpad ataletinin ikinci yolculuk başlatmasını önle
       },
     });
+  }
+
+  // y konumunda dir yönünde bir hareket nereye götürmeli? null = doğal kaydırma
+  function decide(y: number, dir: number): number | null {
+    const vh = window.innerHeight;
+    const TOL = Math.max(120, vh * 0.15); // bu kadar az kalmışsa doğal kaydırma yerine bölüme geç
+    let i = 0;
+    sections.forEach((s, k) => {
+      if (topOf(s) <= y + 2) i = k;
+    });
+    const cur = sections[i];
+    if (dir > 0) {
+      if (cur.offsetTop + cur.offsetHeight - (y + vh) > TOL) return null; // uzun bölümün içi
+      const next = sections[i + 1];
+      return next ? topOf(next) : null;
+    }
+    if (y - topOf(cur) > TOL) return null;
+    const prev = sections[i - 1];
+    if (!prev) return null;
+    // Önceki bölüm uzunsa altı görünecek şekilde dur; oradan yukarısı doğal kaydırma
+    return Math.max(topOf(prev), prev.offsetTop + prev.offsetHeight - vh);
+  }
+
+  // İmlecin altında o yönde kayabilen iç kutu varsa tekerlek ona kalsın
+  function innerScrollable(t: EventTarget | null, dir: number) {
+    for (let el = t instanceof Element ? t : null; el && el !== document.body; el = el.parentElement) {
+      if (el.scrollHeight <= el.clientHeight + 1) continue;
+      const oy = getComputedStyle(el).overflowY;
+      if (oy !== 'auto' && oy !== 'scroll') continue;
+      if (dir > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0) return true;
+    }
+    return false;
   }
 
   // Menü ve sayfa içi linkler aynı yolculuğu yapar
@@ -133,54 +173,67 @@ if (animate) {
   });
 
   if (finePointer) {
+    let gLast = 0; // son olayın zamanı
+    let gDir = 0;
+    let gPeak = 0; // hareketteki en büyük delta
+    let gPrev = 0; // önceki olayın deltası
+    let gAcc = 0; // biriken delta
+    let gMode: 'pending' | 'native' | 'travel' = 'native';
+
     window.addEventListener(
       'wheel',
       (e) => {
         if (e.ctrlKey) return; // zoom
         if (document.querySelector('dialog[open]')) return; // lightbox açıkken sayfayı kaydırma
+        const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1);
+        const abs = Math.abs(dy);
+        if (abs === 0 || Math.abs(e.deltaX) > abs) return; // yatay kaydırma
+
+        const dir = Math.sign(dy);
+        const now = performance.now();
+        // Yeni hareket: ara verildi, yön değişti, atalet sönerken yeniden hızlandı (yeni fiske) ya da
+        // geçiş bittikten sonra tekerlek hâlâ tam hızda dönüyor (fare: her çentik ~aynı delta, atalet sönümlenir)
+        const fresh =
+          now - gLast > GAP ||
+          dir !== gDir ||
+          (gPrev < gPeak * 0.6 && abs > gPrev * 2 && abs > 20) ||
+          (gMode === 'travel' && !traveling && abs >= gPeak * 0.8);
+        gLast = now;
+        gPrev = abs;
+        if (fresh) {
+          gDir = dir;
+          gPeak = abs;
+          gAcc = 0;
+          gMode = 'pending';
+        } else gPeak = Math.max(gPeak, abs);
+        gAcc += abs;
+
         if (traveling) {
-          e.preventDefault();
+          e.preventDefault(); // geçişle tarayıcı kaydırması çakışmasın
+          if (!fresh) return;
+          gMode = 'travel';
+          if (dir !== travelDir) travelTo(travelFrom, travelTarget); // ters yön: geri dön
+          else {
+            const t = decide(travelTarget, dir); // aynı yön: bir sonrakine devam
+            if (t !== null) travelTo(t, travelTarget);
+          }
           return;
         }
-        if (performance.now() < cooldownUntil || Math.abs(e.deltaY) < 8) return;
-
-        const y = window.scrollY;
-        const vh = window.innerHeight;
-        let i = 0;
-        sections.forEach((s, k) => {
-          if (topOf(s) <= y + 2) i = k;
-        });
-        const cur = sections[i];
-        const curBottom = cur.offsetTop + cur.offsetHeight;
-
-        const TOL = Math.max(120, vh * 0.15); // bu kadar az kalmışsa ara durak yapma
-
-        if (e.deltaY > 0) {
-          const remaining = curBottom - (y + vh);
-          if (remaining > TOL) {
-            // Uzun bölüm: önce altını hizala (içerik atlanmasın), sonraki tekerlekte diğer bölüme
-            e.preventDefault();
-            travelTo(curBottom - vh);
-            return;
-          }
-          const next = sections[i + 1];
-          if (!next) return;
-          e.preventDefault();
-          travelTo(topOf(next));
-        } else {
-          const intoSection = y - topOf(cur);
-          if (intoSection > TOL) {
-            e.preventDefault();
-            travelTo(topOf(cur)); // önce bulunduğumuz bölümün başına
-            return;
-          }
-          const prev = sections[i - 1];
-          if (!prev) return;
-          e.preventDefault();
-          // Önceki bölüm uzunsa altı görünecek şekilde git ki içerik atlanmasın
-          const prevBottomAligned = prev.offsetTop + prev.offsetHeight - vh;
-          travelTo(Math.max(topOf(prev), prevBottomAligned));
+        if (gMode === 'native') return;
+        if (gMode === 'travel') {
+          e.preventDefault(); // geçişin ardından gelen atalet
+          return;
         }
+        // pending: hareketin ilk olayları
+        const t = innerScrollable(e.target, dir) ? null : decide(window.scrollY, dir);
+        if (t === null) {
+          gMode = 'native'; // hareket sonuna kadar doğal kalır, sınıra varınca kendiliğinden geçiş yapmaz
+          return;
+        }
+        e.preventDefault();
+        if (gAcc < 8) return; // touchpad gürültüsü
+        gMode = 'travel';
+        travelTo(t);
       },
       { passive: false },
     );
