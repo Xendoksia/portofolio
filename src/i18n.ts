@@ -121,7 +121,7 @@ const tr: UI = {
     scrollAria: 'Hakkımda bölümüne kaydır',
   },
   about: { label: 'Bölüm I · Hakkımda', title: ['Ham veriden', 'canlıdaki modele.'] },
-  experience: { label: 'Bölüm II · Deneyim', title: 'Eğitim gördüğüm yerler.' },
+  experience: { label: 'Bölüm II · Deneyim', title: 'Tecrübelerim.' },
   projects: {
     label: 'Bölüm III · Projeler',
     title: 'Seçilmiş görevler.',
