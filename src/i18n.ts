@@ -136,7 +136,7 @@ const tr: UI = {
   skills: { label: 'Bölüm IV · Yetenekler', title: 'The toolkit.' },
   education: {
     label: 'Bölüm V · Eğitim',
-    title: 'Akademi yılları.',
+    title: 'Eğitimim.',
     langs: 'Diller',
     turkish: 'Türkçe — Ana dil',
     english: 'İngilizce — Profesyonel çalışma düzeyinde',
