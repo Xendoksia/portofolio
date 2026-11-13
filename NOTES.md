@@ -125,3 +125,10 @@ Açık kalanlar / sıradaki:
 - **npm audit:** Astro <=7.4.6 orta seviye uyarı (dinamik tag XSS, @astrojs/node — bu sitede ikisi de kullanılmıyor). Düzelten sürümler Node >=22.23.4 istiyor, yerel Node 22.21 → güncellenmedi. Node güncellenirse `npm audit fix`.
 - Projelere doğrudan link ve 404 sayfası: kullanıcı gerek görmedi (14 Kasım), yapılmayacak. İsteğe bağlı: Google Search Console'a sitemap'i göndermek (kullanıcı tarafında).
 - **Kapanış (14 Kasım):** kullanıcı telefonda ve touchpad'de test etti, sorun yok. Cloudflare Worker/Pages silindi. İçerik soruları (Episode etiketleri, "Open a / channel." satır bölünmesi, Network Analysis açıklaması, AutoRate BLEU, Playlist Tracker öne çıkarma) → hepsi olduğu gibi kalıyor. Açık iş: yalnızca Google Search Console (kullanıcı tarafında, isteğe bağlı) ve Node güncellenirse `npm audit fix`.
+
+## Tema detayları (14 Kasım) — kullanıcı 4, 6, 7'yi seçti; 1, 2, 3, 5, 8 istenmedi
+- **4 — Hologram proje görselleri — YAPILDI** (`CaseStudy.astro`, `.holo`): /projects vaka kutusunun üstüne gelince tarama çizgileri + kısa titreme + aşağı süzülen ışık bandı; renk `--accent` (dark kırmızı, light mavi). Küçük resimle slayt değişince de kısa titreme (`.is-tuning`). Sadece opacity/transform; hareketi azalt'ta titreme ve band yok.
+- **SIRADA (kullanıcı "4'ten sonra duralım" dedi):**
+  - **6 — Mesaj gönderilince kayan yıldız:** iletişim formu başarıyla gönderilince düğmeden yıldızlara doğru tek seferlik bir iz (transform/opacity, bir kez oynar).
+  - **7 — CV düğmesine tema esprisi:** üzerine gelince küçük yazı; light: "The plans you're looking for", dark: "Stolen Death Star plans" (TR karşılıkları da yazılacak; `.side-dark`/`.side-light` sınıflarıyla).
+  - Her biri ayrı commit + push.

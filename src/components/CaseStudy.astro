@@ -64,6 +64,8 @@ const fulls = await Promise.all(slides.map((s) => Promise.all(s.map(full))));
             </span>
           ))
         }
+        {/* Hologram katmanı: tarama çizgileri + aşağı süzülen ışık bandı (renk temaya göre) */}
+        <span class="holo" aria-hidden="true"><span class="holo__sweep"></span></span>
       </span>
       <span class="shotbox__corner shotbox__corner--tl" aria-hidden="true"></span>
       <span class="shotbox__corner shotbox__corner--br" aria-hidden="true"></span>
@@ -222,6 +224,69 @@ const fulls = await Promise.all(slides.map((s) => Promise.all(s.map(full))));
   .slide--phones :global(.shot:nth-child(2)) {
     transform: translateY(-3%);
   }
+  /* ---------- Hologram ----------
+     Üstüne gelince (ve slayt değişince) görsel kısa bir titremeyle hologram gibi "açılır".
+     Sadece opacity/transform — yeniden boyama yok. */
+  .holo {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--accent) 12%, transparent) 0 1px,
+        transparent 1px 3px
+      ),
+      linear-gradient(color-mix(in srgb, var(--accent) 5%, transparent), color-mix(in srgb, var(--accent) 5%, transparent));
+    transition: opacity 0.35s;
+  }
+  .holo__sweep {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 28%;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in srgb, var(--accent) 22%, transparent) 70%,
+      color-mix(in srgb, var(--accent) 35%, transparent) 96%,
+      transparent
+    );
+    transform: translateY(-100%);
+  }
+  .shotbox:hover .holo,
+  .shotbox:focus-visible .holo {
+    opacity: 1;
+  }
+  :global(html.anim) .shotbox:hover .holo,
+  :global(html.anim) .shotbox:focus-visible .holo,
+  :global(html.anim) .shotbox.is-tuning .holo {
+    animation: holo-flicker 0.5s steps(1, end);
+  }
+  :global(html.anim) .shotbox:hover .holo__sweep,
+  :global(html.anim) .shotbox:focus-visible .holo__sweep {
+    animation: holo-sweep 2.8s cubic-bezier(0.45, 0, 0.55, 1) 0.15s infinite;
+  }
+  /* Slayt değişince: titreme hover yokken de görünsün */
+  :global(html.anim) .shotbox.is-tuning .holo {
+    opacity: 1;
+  }
+  @keyframes holo-flicker {
+    0% { opacity: 0; }
+    12% { opacity: 1; }
+    22% { opacity: 0.25; }
+    34% { opacity: 0.9; }
+    46% { opacity: 0.4; }
+    60%, 100% { opacity: 1; }
+  }
+  @keyframes holo-sweep {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(360%); }
+  }
+
   .case__caption {
     margin: 10px 2px 0;
     min-height: 1.5em;
@@ -439,6 +504,12 @@ const fulls = await Promise.all(slides.map((s) => Promise.all(s.map(full))));
         slides.forEach((s, k) => s.classList.toggle('is-active', k === i));
         caption.textContent = t.dataset.caption!;
         thumbs.forEach((b, k) => b.classList.toggle('is-active', k === i));
+        // Hologram "kanal değiştirir": kısa titreme
+        const box = caseEl.querySelector<HTMLElement>('.shotbox')!;
+        box.classList.remove('is-tuning');
+        void box.offsetWidth;
+        box.classList.add('is-tuning');
+        setTimeout(() => box.classList.remove('is-tuning'), 520);
       }),
     );
   });
