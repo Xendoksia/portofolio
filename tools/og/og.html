@@ -1,0 +1,53 @@
+<!doctype html>
+<!-- Paylaşım önizleme görseli (1200×630). Üretmek için: node tools/og/make-og.mjs -->
+<html>
+<head>
+<meta charset="UTF-8" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: radial-gradient(ellipse 70% 90% at 78% 50%, #120a10 0%, #05060a 65%);
+    color: #e8e9ee; font-family: 'Space Grotesk', sans-serif; position: relative;
+  }
+  canvas { position: absolute; inset: 0; }
+  .wrap { position: absolute; left: 96px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+  .label { font-family: 'JetBrains Mono', monospace; font-size: 22px; letter-spacing: 0.18em; text-transform: uppercase; color: #8b90a0; margin-bottom: 26px; }
+  .label b { color: #ff3b3b; font-weight: 500; }
+  h1 { margin: 0; font-size: 104px; line-height: 0.98; font-weight: 700; letter-spacing: -0.03em; }
+  .saber { margin: 40px 0 34px; width: 560px; height: 5px; border-radius: 3px; background: #ffe9e9;
+    box-shadow: 0 0 6px #ff3b3b, 0 0 18px rgba(255,40,40,.75), 0 0 42px rgba(255,30,30,.45); position: relative; }
+  .saber::before { content: ''; position: absolute; left: -64px; top: -5px; width: 60px; height: 15px; border-radius: 3px;
+    background: linear-gradient(#5b5f6b, #2a2d35 60%, #3b3e47); }
+  .role { font-size: 38px; font-weight: 500; }
+  .url { position: absolute; right: 64px; bottom: 48px; font-family: 'JetBrains Mono', monospace; font-size: 22px; color: #8b90a0; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1200" height="630"></canvas>
+<div class="wrap">
+  <div class="label" id="label"></div>
+  <h1>Deniz<br />Kanlıcalıoğlu</h1>
+  <div class="saber"></div>
+  <div class="role" id="role"></div>
+</div>
+<div class="url">deniz-kanlicalioglu.vercel.app</div>
+<script>
+  var tr = location.search.indexOf('lang=tr') >= 0;
+  document.getElementById('label').innerHTML = tr ? '<b>●</b> Portfolyo' : '<b>●</b> Portfolio';
+  document.getElementById('role').textContent = tr ? 'Yapay Zekâ ve Makine Öğrenmesi Mühendisi' : 'AI & Machine Learning Engineer';
+  // Sabit tohumlu yıldızlar: her üretimde aynı görsel
+  var s = 7, rnd = function () { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  var ctx = document.getElementById('c').getContext('2d');
+  for (var i = 0; i < 420; i++) {
+    var x = rnd() * 1200, y = rnd() * 630, z = rnd();
+    var r = 0.4 + z * z * 1.6, a = 0.25 + z * 0.75;
+    // Metnin arkasında daha seyrek
+    if (x < 820 && rnd() < 0.55) continue;
+    if (x < 940 && y > 105 && y < 520) continue; // yazıların üstüne düşmesin
+    ctx.fillStyle = 'rgba(255,255,255,' + a + ')';
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill();
+  }
+</script>
+</body>
+</html>
