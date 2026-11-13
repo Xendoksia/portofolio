@@ -21,9 +21,9 @@ const top = (id) => ev(`Math.max(0,document.getElementById('${id}').offsetTop-40
 // scroll izini kaydet: kare başına en büyük sıçrama
 const track = () => ev(`(window.__tr=[],(function f(){__tr.push(scrollY);if(__tr.length<2000)requestAnimationFrame(f)})(),1)`);
 const trackStop = () => ev(`(()=>{const t=__tr;__tr.length=99999;return {min:Math.round(Math.min(...t)),max:Math.round(Math.max(...t))}})()`);
-const swipe = async (dir) => { // touchpad: yükselen deltalar + 1.5 sn sönen atalet, ~16ms aralık
-  for (const d of [3,8,20,45,70,80]) { await wheel(dir*d); await sleep(16); }
-  let d = 80; while (d > 1) { d *= 0.95; await wheel(dir*Math.max(1,Math.round(d))); await sleep(16); }
+const swipe = async (dir) => { // touchpad: yükselen deltalar + 1.5 sn sönen atalet, ~16ms aralık (await yok: CDP onayı ~200ms sürüyor, beklenirse her olay ayrı hareket sayılır)
+  for (const d of [3,8,20,45,70,80]) { wheel(dir*d); await sleep(16); }
+  let d = 80; while (d > 1) { d *= 0.95; wheel(dir*Math.max(1,Math.round(d))); await sleep(16); }
 };
 try {
   await send('Runtime.enable'); await send('Page.bringToFront');
@@ -37,6 +37,12 @@ try {
   await ev(`scrollTo(0,0)`); await sleep(500);
   await swipe(1); await sleep(1200);
   console.log('2 touchpad fiske+atalet:', await Y(), '(about=', await top('about'), ', tek geçiş beklenir)');
+  // 2b) takılan sayfa: atalet sırasında üç kez ~250ms takılma → yine tek geçiş
+  await ev(`scrollTo(0,0)`); await sleep(500);
+  for (const d of [3,8,20,45,70,80]) { wheel(d); await sleep(16); }
+  { let d = 80, n = 0; while (d > 1) { d *= 0.95; n++; wheel(Math.max(1,Math.round(d))); await sleep(n % 25 === 0 ? 250 : 16); } }
+  await sleep(1200);
+  console.log('2b takılmalı atalet:', await Y(), '(about=', await top('about'), ', tek geçiş beklenir)');
   // 3) geri dönme: aşağı çentik, 200ms sonra yukarı
   await ev(`scrollTo(0,0)`); await sleep(500);
   await wheel(100); await sleep(250); const mid = await Y(); await wheel(-100); await sleep(1500);
@@ -45,11 +51,11 @@ try {
   await ev(`scrollTo(0,0)`); await sleep(500);
   for (let i = 0; i < 50; i++) { await wheel(100); await sleep(50); }
   await sleep(1500); console.log('4 sürekli fare 2.5sn:', await Y());
-  // 5) uzun bölüm: projects başından aşağı çentikler 300ms arayla, içerik atlanıyor mu?
+  // 5) projects başından ayrı ayrı çentikler (sayfalı bölüm: altı + sonraki bölüm), içerik atlanıyor mu?
   const pTop = await top('projects'); const pEnd = await ev(`(p=>p.offsetTop+p.offsetHeight)(document.getElementById('projects'))`);
   await ev(`scrollTo(0,${pTop})`); await sleep(600);
   const ys = [];
-  for (let i = 0; i < 40; i++) { await wheel(100); await sleep(i < 39 ? 300 : 1500); const y = await Y(); ys.push(y); if (y >= (await top('skills'))) break; }
+  for (let i = 0; i < 40; i++) { await wheel(100); await sleep(1400); const y = await Y(); ys.push(y); if (y >= (await top('skills'))) break; }
   const steps = ys.map((y,i)=>y-(i?ys[i-1]:pTop));
   console.log('5 projects', pTop, '→', pEnd, 'adımlar:', steps.join(','), '| son y', ys.at(-1), 'skills=', await top('skills'));
   console.log('   en büyük adım', Math.max(...steps), '(> vh ise içerik atlandı)');

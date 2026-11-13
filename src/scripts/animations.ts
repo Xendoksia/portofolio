@@ -94,8 +94,8 @@ if (animate && finePointer) {
 }
 
 /* ---------- Bölümden bölüme yolculuk ----------
-   Karma model: uzun bölümün içinde doğal tarayıcı kaydırması; bölüm sınırına gelince bir tekerlek hareketi
-   yumuşak geçişle komşu bölüme götürür. Tekerlek olayları "hareket" olarak gruplanır (touchpad ataleti tek
+   Karma model: ekrandan en fazla ~bir ekran uzun bölümde başı ve altı birer durak; daha uzun bölümün içinde
+   doğal tarayıcı kaydırması. Bölüm sınırında bir tekerlek hareketi yumuşak geçişle komşu bölüme götürür. Tekerlek olayları "hareket" olarak gruplanır (touchpad ataleti tek
    hareket sayılır, sabit bekleme süresi yok). Geçiş sürerken ters yöne çevirmek geçişi geri alır.
    Dokunmatik ve klavye doğal kalır. */
 if (animate) {
@@ -129,24 +129,30 @@ if (animate) {
   }
 
   // y konumunda dir yönünde bir hareket nereye götürmeli? null = doğal kaydırma
+  // Ekrana sığan ya da en fazla ~bir ekran taşan bölüm "sayfalı": başı ve altı birer durak (taşma < ekran,
+  // içerik atlanmaz). Daha uzun bölümün içi doğal kaydırma, sınırına gelince komşu bölüme geçilir.
   function decide(y: number, dir: number): number | null {
     const vh = window.innerHeight;
-    const TOL = Math.max(120, vh * 0.15); // bu kadar az kalmışsa doğal kaydırma yerine bölüme geç
+    const TOL = Math.max(120, vh * 0.15); // bu kadarlık taşma/kalan yok sayılır
+    const bottomStop = (s: HTMLElement) => s.offsetTop + s.offsetHeight - vh; // bölümün altı hizalı
+    const overflow = (s: HTMLElement) => bottomStop(s) - topOf(s);
+    const paged = (s: HTMLElement) => overflow(s) <= vh * 0.85;
     let i = 0;
     sections.forEach((s, k) => {
       if (topOf(s) <= y + 2) i = k;
     });
     const cur = sections[i];
     if (dir > 0) {
-      if (cur.offsetTop + cur.offsetHeight - (y + vh) > TOL) return null; // uzun bölümün içi
+      const remaining = bottomStop(cur) - y;
+      if (remaining > TOL) return paged(cur) ? bottomStop(cur) : null;
       const next = sections[i + 1];
       return next ? topOf(next) : null;
     }
-    if (y - topOf(cur) > TOL) return null;
+    if (y - topOf(cur) > TOL) return paged(cur) ? topOf(cur) : null;
     const prev = sections[i - 1];
     if (!prev) return null;
-    // Önceki bölüm uzunsa altı görünecek şekilde dur; oradan yukarısı doğal kaydırma
-    return Math.max(topOf(prev), prev.offsetTop + prev.offsetHeight - vh);
+    // Önceki bölüm ekrana (neredeyse) sığıyorsa başına, uzunsa altı hizalı dur
+    return overflow(prev) <= TOL ? topOf(prev) : Math.max(topOf(prev), bottomStop(prev));
   }
 
   // İmlecin altında o yönde kayabilen iç kutu varsa tekerlek ona kalsın
@@ -191,10 +197,12 @@ if (animate) {
 
         const dir = Math.sign(dy);
         const now = performance.now();
-        // Yeni hareket: ara verildi, yön değişti, atalet sönerken yeniden hızlandı (yeni fiske) ya da
+        // Yeni hareket: ara verildi (sayfa takılıp atalet olayları gecikmediyse), yön değişti, atalet sönerken yeniden hızlandı (yeni fiske) ya da
         // geçiş bittikten sonra tekerlek hâlâ tam hızda dönüyor (fare: her çentik ~aynı delta, atalet sönümlenir)
+        const gap = now - gLast;
         const fresh =
-          now - gLast > GAP ||
+          gap > 400 ||
+          (gap > GAP && abs >= gPrev && abs >= gPeak * 0.5) || // kısa takılmadan sonra sönmeye devam eden atalet yeni hareket değildir
           dir !== gDir ||
           (gPrev < gPeak * 0.6 && abs > gPrev * 2 && abs > 20) ||
           (gMode === 'travel' && !traveling && abs >= gPeak * 0.8);
