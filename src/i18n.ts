@@ -143,7 +143,7 @@ const tr: UI = {
   },
   contact: {
     label: 'Bölüm VI · İletişim',
-    title: ['Bir ', 'kanal', ' açın.'],
+    title: ['', 'Bağlantı', ' kuralım.'],
     text: 'Bir yapay zekâ / ML mühendisi ya da hackathon takım arkadaşı mı arıyorsunuz, yoksa sadece modeller üzerine konuşmak mı istiyorsunuz? Bir mesaj gönderin, doğrudan gelen kutuma düşsün.',
     barDark: ['İmparatorluk kanalı', '· şifreli'],
     barLight: ['Güvenli kanal', '· Asi frekansı'],
