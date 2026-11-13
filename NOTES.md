@@ -105,3 +105,13 @@ Açık kalanlar / sıradaki:
 - İki sütunda "Open a / channel." bazı genişliklerde iki satıra bölünüyor (kullanıcıya soruldu).
 - Touchpad'li gerçek cihazda bölüm geçişi hissi kullanıcıdan teyit bekliyor.
 - Yukarıdaki "SONRA YAPILACAKLAR" 2–5 (OG görseli, sitemap/robots, Lighthouse, telefon testi, içerik soruları) hâlâ geçerli.
+
+## Dil desteği EN / TR (13 Kasım, ~14:40)
+- **İngilizce ana dil** (`/`, `/projects`), **Türkçe** `/tr`, `/tr/projects`. Astro i18n (`astro.config.mjs`, `prefixDefaultLocale: false`); bileşenler dili `Astro.currentLocale`'den alır.
+- Sayfa gövdeleri `src/views/` (HomePage, ProjectsPage); `src/pages/` ve `src/pages/tr/` sadece onları çağırır.
+- **İçerik** hâlâ tek dosya `content.ts`: dile göre değişen metin `{ en, tr }` çifti, aynı kalan düz metin. `getContent(lang)` çiftleri çözer. Yeni proje/madde eklerken iki dili de yaz.
+- **Arayüz metinleri** `src/i18n.ts` → `ui` (sunucu) ve `clientUI()` (tarayıcı script'leri: form mesajları, kopyala, sekme başlığı, konsol, tema etiketi; dil `<html lang>`'dan). Yol yardımcıları: `path('/projects', lang)`, `switchPath(pathname, lang)`.
+- Menüde **EN | TR** düğmesi (tema kılıcının solunda): bulunulan sayfanın diğer dildeki karşılığına gider. Tarayıcı diline göre otomatik yönlendirme **yok**.
+- `hreflang` + `og:locale` (Layout). Form konusu Türkçe sayfadan gelince `(TR)` ekli → hangi dilden yazıldığı görünür.
+- Türkçe tema etiketi uzun ("Karanlık taraf"): kılıç etiketi `nowrap`, 1020 px altında menü link boşluğu 9 px. 360–1440 px ölçüldü, çakışma yok.
+- Proje kimliği `project.id` (İngilizce başlıktan slug) — vaka kutusundaki sahte dosya adı bundan; ileride `/projects#id` linkleri için de kullanılabilir.

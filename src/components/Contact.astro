@@ -1,18 +1,22 @@
 ---
-import { profile } from '../data/content';
+import { getContent } from '../data/content';
+import { getLang, ui } from '../i18n';
+
+const lang = getLang(Astro.currentLocale);
+const { profile } = getContent(lang);
+const t = ui[lang].contact;
 const year = new Date().getFullYear();
 ---
 
 <section id="contact" class="contact">
   <div class="container contact__grid">
     <div class="contact__intro">
-      <p class="section-label" data-reveal>Episode VI · Contact</p>
+      <p class="section-label" data-reveal>{t.label}</p>
       <h2 class="contact__title" data-reveal>
-        Open a <span>channel</span>.
+        {t.title[0]}<span>{t.title[1]}</span>{t.title[2]}
       </h2>
       <p class="contact__text" data-reveal>
-        Looking for an AI / ML engineer, a hackathon teammate, or just want to talk models? Send a transmission and it
-        lands straight in my inbox.
+        {t.text}
       </p>
     </div>
 
@@ -21,38 +25,38 @@ const year = new Date().getFullYear();
         <form class="cform card" id="contact-form" data-reveal novalidate>
           <p class="cform__bar mono" aria-hidden="true">
             <span class="cform__signal"></span>
-            <span class="side-dark">Imperial channel <em>· encrypted</em></span>
-            <span class="side-light">Secure channel <em>· Rebel frequency</em></span>
+            <span class="side-dark">{t.barDark[0]} <em>{t.barDark[1]}</em></span>
+            <span class="side-light">{t.barLight[0]} <em>{t.barLight[1]}</em></span>
           </p>
           <input type="hidden" name="access_key" value={profile.contactFormKey} />
-          <input type="hidden" name="subject" value="New message from your portfolio" />
+          <input type="hidden" name="subject" value={`New message from your portfolio${lang === 'en' ? '' : ` (${lang.toUpperCase()})`}`} />
           <input type="hidden" name="from_name" value="Portfolio contact form" />
           {/* Spam tuzağı: insanlar görmez, botlar doldurur → Web3Forms reddeder */}
           <input type="checkbox" name="botcheck" class="cform__trap" tabindex="-1" autocomplete="off" aria-hidden="true" />
           <div class="cform__row">
             <label class="cform__field">
-              <span class="mono">Name</span>
+              <span class="mono">{t.name}</span>
               <input name="name" type="text" autocomplete="name" required maxlength="100" />
             </label>
             <label class="cform__field">
-              <span class="mono">Email</span>
+              <span class="mono">{t.email}</span>
               <input name="email" type="email" autocomplete="email" required maxlength="200" />
             </label>
           </div>
           <label class="cform__field">
-            <span class="mono">Message</span>
+            <span class="mono">{t.message}</span>
             <textarea
               name="message"
               rows="5"
               required
               maxlength="5000"
-              data-dark="Join me, and together we can rule the galaxy…"
-              data-light="Help me, Obi-Wan Kenobi. You're my only hope…"></textarea>
+              data-dark={t.placeholderDark}
+              data-light={t.placeholderLight}></textarea>
           </label>
           <div class="cform__foot">
             <p class="cform__status" id="cform-status" role="status" aria-live="polite"></p>
             <button class="btn btn--primary" type="submit" id="cform-send">
-              <span id="cform-label">Send transmission</span>
+              <span id="cform-label">{t.send}</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15m0 0-6-6m6 6-6 6"></path></svg>
             </button>
           </div>
@@ -61,7 +65,7 @@ const year = new Date().getFullYear();
         <div class="contact__mail" data-reveal>
           <a class="contact__email" href={`mailto:${profile.email}`}>{profile.email}</a>
           <button class="btn" type="button" id="copy-email" data-email={profile.email}>
-            <span id="copy-label">Copy</span>
+            <span id="copy-label">{t.copy}</span>
           </button>
         </div>
       )
@@ -71,9 +75,9 @@ const year = new Date().getFullYear();
       {
         profile.contactFormKey && (
           <p class="contact__direct" data-reveal>
-            Prefer a direct line? <a href={`mailto:${profile.email}`}>{profile.email}</a>
+            {t.direct} <a href={`mailto:${profile.email}`}>{profile.email}</a>
             <button class="contact__copy mono" type="button" id="copy-email" data-email={profile.email}>
-              <span id="copy-label">Copy</span>
+              <span id="copy-label">{t.copy}</span>
             </button>
           </p>
         )
@@ -94,7 +98,7 @@ const year = new Date().getFullYear();
         <li>
           <a class="btn btn--primary" href={profile.cv} download data-magnetic>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"></path></svg>
-            Download CV
+            {t.cv}
           </a>
         </li>
       </ul>
@@ -103,8 +107,8 @@ const year = new Date().getFullYear();
 
   <footer class="footer container mono">
     <span>© {year} {profile.name}</span>
-    <span class="footer__motto side-dark">I find your lack of code disturbing.</span>
-    <span class="footer__motto side-light">May the code be with you.</span>
+    <span class="footer__motto side-dark">{t.footerDark}</span>
+    <span class="footer__motto side-light">{t.footerLight}</span>
   </footer>
 </section>
 
@@ -414,6 +418,9 @@ const year = new Date().getFullYear();
 </style>
 
 <script>
+  import { clientUI } from '../i18n';
+  const T = clientUI();
+
   // ---------- İletişim formu (Web3Forms) ----------
   const form = document.getElementById('contact-form') as HTMLFormElement | null;
   if (form) {
@@ -429,14 +436,8 @@ const year = new Date().getFullYear();
     // Tarafa göre değişen metinler (dark side = İmparatorluk, light side = Asiler)
     const side = () => (document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
     const SIDE_TEXT = {
-      dark: {
-        ok: "Transmission received. I've been expecting you.",
-        err: 'Signal jammed. Please try again or email me directly.',
-      },
-      light: {
-        ok: "Transmission received. I'll get back to you soon.",
-        err: 'Signal lost. Please try again or email me directly.',
-      },
+      dark: { ok: T.okDark, err: T.errDark },
+      light: { ok: T.okLight, err: T.errLight },
     };
     const message = form.querySelector('textarea')!;
     const syncSide = () => (message.placeholder = message.dataset[side()]!);
@@ -450,13 +451,13 @@ const year = new Date().getFullYear();
       const bad = fields.filter((f) => !f.value.trim() || !f.checkValidity());
       fields.forEach((f) => f.classList.toggle('is-invalid', bad.includes(f)));
       if (bad.length) {
-        setStatus(bad[0].type === 'email' && bad[0].value ? 'Please enter a valid email.' : 'Please fill in all fields.', 'err');
+        setStatus(bad[0].type === 'email' && bad[0].value ? T.badEmail : T.empty, 'err');
         bad[0].focus();
         return;
       }
 
       send.disabled = true;
-      sendLabel.textContent = 'Transmitting…';
+      sendLabel.textContent = T.sending;
       setStatus('');
       try {
         const res = await fetch('https://api.web3forms.com/submit', {
@@ -472,7 +473,7 @@ const year = new Date().getFullYear();
         setStatus(SIDE_TEXT[side()].err, 'err');
       } finally {
         send.disabled = false;
-        sendLabel.textContent = 'Send transmission';
+        sendLabel.textContent = T.send;
       }
     });
   }
@@ -483,11 +484,10 @@ const year = new Date().getFullYear();
   btn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(btn.dataset.email!);
-      label.textContent =
-        document.documentElement.dataset.theme === 'light' ? 'Copied. The Force is with you.' : 'Copied. As I have foreseen.';
+      label.textContent = document.documentElement.dataset.theme === 'light' ? T.copiedLight : T.copiedDark;
     } catch {
-      label.textContent = 'Copy failed';
+      label.textContent = T.copyFailed;
     }
-    setTimeout(() => (label.textContent = 'Copy'), 1800);
+    setTimeout(() => (label.textContent = T.copy), 1800);
   });
 </script>

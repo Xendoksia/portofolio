@@ -1,6 +1,11 @@
 ---
-import { projects, profile } from '../data/content';
+import { getContent } from '../data/content';
+import { getLang, path, ui } from '../i18n';
 import ProjectCard from './ProjectCard.astro';
+
+const lang = getLang(Astro.currentLocale);
+const { projects, profile } = getContent(lang);
+const t = ui[lang].projects;
 
 // Ana sayfada sadece öne çıkanlar; geri kalanı /projects'te. Panel, gizli projelerin adlarını gösterip oraya çağırır.
 const featured = projects.filter((p) => p.featured);
@@ -11,34 +16,34 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 <section id="projects">
   <div class="container">
-    <p class="section-label" data-reveal>Episode III · Projects</p>
-    <h2 class="section-title" data-reveal>Selected missions.</h2>
+    <p class="section-label" data-reveal>{t.label}</p>
+    <h2 class="section-title" data-reveal>{t.title}</h2>
 
     <div class="featured">
       {featured.map((p, i) => <ProjectCard project={p} big num={i + 1} />)}
     </div>
 
-    <a class="card hangar" href="/projects" data-reveal data-glow>
+    <a class="card hangar" href={path('/projects', lang)} data-reveal data-glow>
       <span class="hangar__saber" aria-hidden="true"></span>
       <div class="hangar__text">
         <p class="hangar__label mono">
-          <span>+{pad(hidden.length)}</span> more missions · {caseCount} full case studies
+          <span>+{pad(hidden.length)}</span> {t.more(caseCount)}
         </p>
-        <h3>The rest of the fleet is in the hangar.</h3>
-        <p class="hangar__desc">Screenshots, how each one was built and the results, project by project.</p>
-        <ul class="hangar__list" aria-label="More projects">
+        <h3>{t.hangar}</h3>
+        <p class="hangar__desc">{t.hangarDesc}</p>
+        <ul class="hangar__list" aria-label={t.moreAria}>
           {hidden.map((p) => <li class="mono">{p.title}</li>)}
         </ul>
       </div>
       <span class="hangar__cta">
-        Explore all projects
+        {t.all}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
       </span>
     </a>
 
     <div class="more" data-reveal>
       <a class="more__gh mono" href={profile.github} target="_blank" rel="noopener">
-        or browse everything on GitHub
+        {t.github}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"></path></svg>
       </a>
     </div>

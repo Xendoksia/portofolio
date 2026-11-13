@@ -1,6 +1,7 @@
 ---
 // Proje kartı: ana sayfada (büyük + küçük) ve /projects sayfasında (küçük) kullanılır.
 import type { Project } from '../data/content';
+import { getLang, ui } from '../i18n';
 
 interface Props {
   project: Project;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const { project: p, big = false, num } = Astro.props;
+const t = ui[getLang(Astro.currentLocale)].card;
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
@@ -23,7 +25,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
   {
     big && (
       <span class="pcard__link mono">
-        View on GitHub
+        {t.github}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M7 17 17 7M8 7h9v9" />
         </svg>

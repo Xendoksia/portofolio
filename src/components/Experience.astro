@@ -1,11 +1,16 @@
 ---
-import { experience } from '../data/content';
+import { getContent } from '../data/content';
+import { getLang, ui } from '../i18n';
+
+const lang = getLang(Astro.currentLocale);
+const { experience } = getContent(lang);
+const t = ui[lang];
 ---
 
 <section id="experience">
   <div class="container">
-    <p class="section-label" data-reveal>Episode II · Experience</p>
-    <h2 class="section-title" data-reveal>Where I've trained.</h2>
+    <p class="section-label" data-reveal>{t.experience.label}</p>
+    <h2 class="section-title" data-reveal>{t.experience.title}</h2>
 
     <ol class="timeline" data-timeline>
       <!-- Scroll ile dolan ışın -->

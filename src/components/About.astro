@@ -1,11 +1,16 @@
 ---
-import { profile } from '../data/content';
+import { getContent } from '../data/content';
+import { getLang, ui } from '../i18n';
+
+const lang = getLang(Astro.currentLocale);
+const { profile } = getContent(lang);
+const t = ui[lang];
 ---
 
 <section id="about">
   <div class="container">
-    <p class="section-label" data-reveal>Episode I · About</p>
-    <h2 class="section-title" data-reveal>From raw data<br />to deployed models.</h2>
+    <p class="section-label" data-reveal>{t.about.label}</p>
+    <h2 class="section-title" data-reveal>{t.about.title[0]}<br />{t.about.title[1]}</h2>
 
     <div class="about">
       <!-- Hafif perspektifli, scroll'la düzleşen metin bloğu -->

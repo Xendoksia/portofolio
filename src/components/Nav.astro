@@ -1,29 +1,35 @@
 ---
-import { nav, profile } from '../data/content';
+import { getContent } from '../data/content';
+import { getLang, path, switchPath, ui } from '../i18n';
 
 interface Props {
-  // Alt sayfalarda (örn. /projects) linkler ana sayfaya gider: "/#about"
-  base?: string;
+  // Alt sayfalarda (örn. /projects) linkler ana sayfaya gider: "/#about" (Türkçede "/tr#about")
+  sub?: boolean;
   // Alt sayfada vurgulanacak menü öğesi
   active?: string;
 }
 
-const { base = '', active } = Astro.props;
+const { sub = false, active } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const { nav, profile } = getContent(lang);
+const t = ui[lang].nav;
+const home = path('/', lang);
+const other = lang === 'en' ? 'tr' : 'en';
 ---
 
 <header class="nav" data-fixed-active={active ? '' : undefined} data-email={profile.email} data-github={profile.github}>
   <div class="nav__inner container">
-    <a href={base ? '/' : '#top'} class="nav__logo mono" aria-label={base ? 'Home' : 'Back to top'}>
+    <a href={sub ? home : '#top'} class="nav__logo mono" aria-label={sub ? t.home : t.top}>
       <span class="nav__dot"></span><span>{profile.firstName}<span class="nav__k">.dev</span></span>
     </a>
 
-    <nav aria-label="Main">
+    <nav aria-label={t.main}>
       <ul class="nav__links" id="nav-links">
         {
           nav.map((item) => (
             <li>
               <a
-                href={item.id === active ? '#top' : `${base}#${item.id}`}
+                href={item.id === active ? '#top' : sub ? path(`/#${item.id}`, lang) : `#${item.id}`}
                 data-nav={item.id}
                 class:list={{ 'is-active': item.id === active }}
               >
@@ -36,11 +42,21 @@ const { base = '', active } = Astro.props;
     </nav>
 
     <div class="nav__actions">
-      <button class="saber" id="theme-toggle" type="button" aria-label="Toggle theme">
-        <span class="saber__label mono" id="theme-label">Dark side</span>
+      {/* Dil: bulunulan sayfanın diğer dildeki karşılığına gider */}
+      <a
+        class="lang mono"
+        href={switchPath(Astro.url.pathname, other)}
+        hreflang={other}
+        lang={other}
+        aria-label={ui[lang].switchTo}
+      >
+        <span class:list={{ 'is-on': lang === 'en' }}>EN</span><span class:list={{ 'is-on': lang === 'tr' }}>TR</span>
+      </a>
+      <button class="saber" id="theme-toggle" type="button" aria-label={t.theme}>
+        <span class="saber__label mono" id="theme-label">{t.dark}</span>
         <span class="saber__hilt" aria-hidden="true"><span class="saber__blade"></span></span>
       </button>
-      <button class="nav__menu" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+      <button class="nav__menu" id="menu-toggle" type="button" aria-label={t.menu} aria-expanded="false" aria-controls="nav-links">
         <span></span><span></span>
       </button>
     </div>
@@ -114,6 +130,37 @@ const { base = '', active } = Astro.props;
     gap: 10px;
   }
 
+  /* Dil düğmesi: EN / TR, etkin olan vurgulu */
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: border-color 0.3s;
+  }
+  .lang:hover {
+    border-color: var(--accent);
+  }
+  .lang span {
+    padding: 5px 8px;
+    border-radius: 999px;
+    color: var(--muted);
+    transition: color 0.25s, background 0.25s;
+  }
+  .lang:hover span:not(.is-on) {
+    color: var(--text);
+  }
+  .lang .is-on {
+    color: #fff;
+    background: var(--accent);
+  }
+
   /* Tema anahtarı: ışın kılıcı */
   .saber {
     display: inline-flex;
@@ -128,6 +175,7 @@ const { base = '', active } = Astro.props;
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    white-space: nowrap;
     transition: border-color 0.3s;
   }
   .saber:hover {
@@ -185,6 +233,12 @@ const { base = '', active } = Astro.props;
     transform: translateY(-3.25px) rotate(-45deg);
   }
 
+  /* Menü yan yana sığsın diye (Türkçede etiketler daha uzun) dar masaüstünde linkler sıkılaşır */
+  @media (max-width: 1020px) {
+    .nav__links a {
+      padding-inline: 9px;
+    }
+  }
   @media (max-width: 900px) {
     .nav__menu {
       display: inline-flex;
@@ -223,6 +277,9 @@ const { base = '', active } = Astro.props;
 </style>
 
 <script>
+  import { clientUI } from '../i18n';
+
+  const T = clientUI();
   const root = document.documentElement;
   const header = document.querySelector('.nav') as HTMLElement;
   const toggle = document.getElementById('theme-toggle') as HTMLButtonElement;
@@ -237,17 +294,15 @@ const { base = '', active } = Astro.props;
   document.addEventListener('visibilitychange', () => {
     document.title = document.hidden
       ? isLight()
-        ? 'Come back, Padawan…'
-        : 'Come back to the dark side…'
+        ? T.awayLight
+        : T.awayDark
       : baseTitle;
   });
 
   // ---------- Konsola bakanlara küçük bir mesaj ----------
   {
     const accent = isLight() ? '#4ea3ff' : '#ff3b3b';
-    const [head, body] = isLight()
-      ? ['The Force is strong with this one.', "You found the console. Let's build something together."]
-      : ['Impressive. Most impressive.', 'You found the console. Now find my inbox.'];
+    const [head, body] = isLight() ? T.consoleLight : T.consoleDark;
     console.log(
       `%c${head}%c\n${body}\n\n✉  ${header.dataset.email}\n⌥  ${header.dataset.github}`,
       `font: 600 16px/1.6 sans-serif; color: ${accent}`,
@@ -255,7 +310,7 @@ const { base = '', active } = Astro.props;
     );
   }
 
-  const labelFor = (t: string) => (t === 'dark' ? 'Dark side' : 'Light side');
+  const labelFor = (t: string) => (t === 'dark' ? T.themeDark : T.themeLight);
   label.textContent = labelFor(root.dataset.theme || 'dark');
 
   function apply(theme: string) {

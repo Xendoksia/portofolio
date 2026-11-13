@@ -1,5 +1,10 @@
 ---
-import { profile } from '../data/content';
+import { getContent } from '../data/content';
+import { getLang, ui } from '../i18n';
+
+const lang = getLang(Astro.currentLocale);
+const { profile } = getContent(lang);
+const t = ui[lang];
 
 const split = (text: string) => [...text];
 ---
@@ -7,8 +12,7 @@ const split = (text: string) => [...text];
 <section class="hero" id="top">
   <div class="container hero__inner">
     <p class="hero__intro mono" data-hero="intro">
-      <span class="side-dark">Not so long ago, on a Death Star not so far away</span><span class="side-light"
-        >Not so long ago, in a lab not so far away</span
+      <span class="side-dark">{t.hero.introDark}</span><span class="side-light">{t.hero.introLight}</span
       ><span class="hero__caret">…</span>
     </p>
 
@@ -38,18 +42,18 @@ const split = (text: string) => [...text];
 
     <div class="hero__cta" data-hero="fade">
       <a class="btn btn--primary" href="#projects" data-magnetic>
-        Explore projects
+        {t.hero.explore}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
       </a>
       <a class="btn" href={profile.cv} download data-magnetic>
-        Download CV
+        {t.hero.cv}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m0 0-5-5m5 5 5-5M5 20h14"></path></svg>
       </a>
     </div>
   </div>
 
-  <a href="#about" class="hero__scroll mono" data-hero="fade" aria-label="Scroll to about">
-    <span>scroll</span>
+  <a href="#about" class="hero__scroll mono" data-hero="fade" aria-label={t.hero.scrollAria}>
+    <span>{t.hero.scroll}</span>
     <span class="hero__scroll-line"></span>
   </a>
 </section>

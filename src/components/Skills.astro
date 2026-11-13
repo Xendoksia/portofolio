@@ -1,11 +1,16 @@
 ---
-import { skills } from '../data/content';
+import { getContent } from '../data/content';
+import { getLang, ui } from '../i18n';
+
+const lang = getLang(Astro.currentLocale);
+const { skills } = getContent(lang);
+const t = ui[lang];
 ---
 
 <section id="skills">
   <div class="container">
-    <p class="section-label" data-reveal>Episode IV · Skills</p>
-    <h2 class="section-title" data-reveal>The toolkit.</h2>
+    <p class="section-label" data-reveal>{t.skills.label}</p>
+    <h2 class="section-title" data-reveal>{t.skills.title}</h2>
 
     <div class="skills">
       {

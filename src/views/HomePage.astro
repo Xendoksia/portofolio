@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Starfield from '../components/Starfield.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Experience from '../components/Experience.astro';
+import Projects from '../components/Projects.astro';
+import Skills from '../components/Skills.astro';
+import Education from '../components/Education.astro';
+import Contact from '../components/Contact.astro';
+---
+
+<Layout>
+  <!-- F5: ana sayfa en üstten başlar (tarayıcı eski kaydırma konumuna/#bölüme dönmez). Geri tuşu ve /projects'ten "/#about" gibi linkler etkilenmez. -->
+  <script is:inline>
+    (function () {
+      var nav = performance.getEntriesByType('navigation')[0];
+      if (!nav || nav.type !== 'reload') return;
+      history.scrollRestoration = 'manual';
+      if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+      window.scrollTo(0, 0);
+      window.addEventListener('load', function () { window.scrollTo(0, 0); });
+    })();
+  </script>
+  <Starfield />
+  <Nav />
+  <main>
+    <Hero />
+    <About />
+    <Experience />
+    <Projects />
+    <Skills />
+    <Education />
+    <Contact />
+  </main>
+</Layout>
+
+<script>
+  import '../scripts/animations';
+</script>

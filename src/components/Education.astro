@@ -1,11 +1,16 @@
 ---
-import { education } from '../data/content';
+import { getContent } from '../data/content';
+import { getLang, ui } from '../i18n';
+
+const lang = getLang(Astro.currentLocale);
+const { education } = getContent(lang);
+const t = ui[lang];
 ---
 
 <section id="education">
   <div class="container">
-    <p class="section-label" data-reveal>Episode V · Education</p>
-    <h2 class="section-title" data-reveal>The academy years.</h2>
+    <p class="section-label" data-reveal>{t.education.label}</p>
+    <h2 class="section-title" data-reveal>{t.education.title}</h2>
 
     <div class="edu">
       {
@@ -21,9 +26,9 @@ import { education } from '../data/content';
     </div>
 
     <div class="langs" data-reveal>
-      <span class="mono">Languages</span>
-      <span>Turkish — Native</span>
-      <span>English — Professional working proficiency</span>
+      <span class="mono">{t.education.langs}</span>
+      <span>{t.education.turkish}</span>
+      <span>{t.education.english}</span>
     </div>
   </div>
 </section>
