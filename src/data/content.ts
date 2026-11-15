@@ -201,16 +201,19 @@ const playlistCaptions: Record<string, { en: string; tr: string }> = {
     en: 'Artist page: bio, plays per day and top tracks',
     tr: 'Sanatçı sayfası: biyografi, günlük dinleme ve en çok dinlenen şarkılar',
   },
-  recent: { en: 'Recently played, recorded from the Spotify app', tr: 'Son dinlenenler, Spotify uygulamasından kaydedildi' },
-  'how-it-works': {
-    en: 'How it works: API limits explained in the app',
-    tr: 'Nasıl çalışır: API sınırları uygulamanın içinde anlatılıyor',
+  recent: {
+    en: 'Recently played with the mini player, recorded from the Spotify app',
+    tr: 'Son dinlenenler ve mini oynatıcı, Spotify uygulamasından kaydedildi',
+  },
+  album: {
+    en: 'Album page: how much of it was heard, track by track',
+    tr: 'Albüm sayfası: ne kadarının dinlendiği, şarkı şarkı',
+  },
+  'monthly-summary-desktop': {
+    en: 'Monthly summary, slide by slide: song of the month',
+    tr: 'Slayt slayt aylık özet: ayın şarkısı',
   },
   'light-theme': { en: 'Light theme', tr: 'Açık tema' },
-  login: {
-    en: 'Google login with Supabase sync, or continue without an account',
-    tr: 'Supabase senkronlu Google girişi ya da hesapsız devam',
-  },
 };
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const galleryFrom = (files: Record<string, { default: ImageMetadata }>, phone: boolean) =>
@@ -477,7 +480,7 @@ const projectsData: ProjectData[] = [
       en: 'Keeps the history of your Spotify & YouTube playlists and builds your own listening statistics from what you actually play — synced between Windows and Android.',
       tr: 'Spotify ve YouTube çalma listelerinin geçmişini tutar, gerçekten dinlediklerinden kendi dinleme istatistiklerini çıkarır — Windows ile Android arasında senkron.',
     },
-    tags: ['Python', 'Flutter', 'Kotlin', 'Supabase', 'SQLite', 'Spotify API', 'YouTube API'],
+    tags: ['Electron', 'React', 'TypeScript', 'Python', 'Flutter', 'Kotlin', 'Supabase', 'SQLite', 'Spotify API', 'YouTube API'],
     repo: gh('Spotify-Track-Ur-Playlist'),
     case: {
       order: 2,
@@ -507,14 +510,14 @@ const projectsData: ProjectData[] = [
           tr: 'Supabase üzerinden çevrimdışı öncelikli senkron (Postgres + Row Level Security + Google OAuth): ana kopya yerel SQLite, yalnızca değişiklikler gönderilir; cihazdan bağımsız UUID’ler ve “son değişiklik kazanır” Postgres tetikleyicisi çakışmaları çözer.',
         },
         {
-          en: 'Desktop in Python/tkinter (tray, autostart, single .exe via PyInstaller, CLI); mobile in Flutter with platform channels to Kotlin. EN / TR, light / dark themes; secrets never leave the device.',
-          tr: 'Masaüstü Python/tkinter ile (sistem tepsisi, otomatik başlatma, PyInstaller ile tek .exe, CLI); mobil Flutter ile, Kotlin’e platform kanalları. EN / TR, açık / koyu tema; gizli anahtarlar cihazdan hiç çıkmaz.',
+          en: 'Desktop window in Electron + React + TypeScript over a Python backend it starts itself, talking through a local JSON API behind a random token; the backend is built with PyInstaller and shipped in an NSIS installer that moves earlier data and takes over autostart (tray, Windows notifications, CLI). Mobile in Flutter with platform channels to Kotlin. EN / TR, light / dark themes; secrets never leave the device.',
+          tr: 'Masaüstü penceresi Electron + React + TypeScript ile, kendi başlattığı bir Python arka ucunun üzerinde; ikisi rastgele bir jetonla korunan yerel bir JSON API üzerinden konuşur. Arka uç PyInstaller ile derlenip eski verileri taşıyan ve otomatik başlatmayı devralan bir NSIS kurulumunda dağıtılır (sistem tepsisi, Windows bildirimleri, CLI). Mobil Flutter ile, Kotlin’e platform kanalları. EN / TR, açık / koyu tema; gizli anahtarlar cihazdan hiç çıkmaz.',
         },
       ],
       metrics: [
-        { value: { en: '16K+', tr: '16 bin+' }, label: { en: 'Lines of Python, Dart & Kotlin', tr: 'Satır Python, Dart ve Kotlin' } },
+        { value: { en: '19K+', tr: '19 bin+' }, label: { en: 'Lines of Python, TypeScript, Dart & Kotlin', tr: 'Satır Python, TypeScript, Dart ve Kotlin' } },
         { value: '2', label: { en: 'Apps: Windows + Android', tr: 'Uygulama: Windows + Android' } },
-        { value: '~90', label: 'Commits' },
+        { value: '~110', label: 'Commits' },
         { value: 'EN / TR', label: { en: 'Interface', tr: 'Arayüz' } },
       ],
       images: playlistGallery,

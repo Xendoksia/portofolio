@@ -132,3 +132,7 @@ Açık kalanlar / sıradaki:
   - **6 — Mesaj gönderilince kayan yıldız:** iletişim formu başarıyla gönderilince düğmeden yıldızlara doğru tek seferlik bir iz (transform/opacity, bir kez oynar).
   - **7 — CV düğmesine tema esprisi:** üzerine gelince küçük yazı; light: "The plans you're looking for", dark: "Stolen Death Star plans" (TR karşılıkları da yazılacak; `.side-dark`/`.side-light` sınıflarıyla).
   - Her biri ayrı commit + push.
+
+## Playlist Tracker güncellemesi (15 Kasım 2026)
+- Masaüstü uygulaması tkinter'dan **Electron + React + TypeScript**'e geçti (Python arka planda, yerel JSON API). Vaka metni, etiketler (Electron/React/TypeScript), metrikler (19K+ satır, ~110 commit) güncellendi.
+- Masaüstü görselleri **monitör içinde** (çerçeveli, saydam arka plan): 01-statistics, 02-artist, 03-album, 04-monthly-summary-desktop, 05-recent, 06-playlists, 07-light-theme. Eski how-it-works ve login görselleri kaldırıldı. Kaynak ve üretici betik: `D:\Portfolyo\Playlist-Tracker\desktop-screenshots.py` (çerçevesizleri `desktop/plain/`).
