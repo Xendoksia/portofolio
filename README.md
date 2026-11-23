@@ -21,7 +21,3 @@ npm run preview  # build edilmiş siteyi önizler
 | Yıldız alanı + hiperuzay girişi | `src/components/Starfield.astro` |
 | CV dosyası | `public/Deniz_Kanlicalioglu_CV.pdf` |
 
-## Yayına alma
-
-GitHub'a push et → Vercel / Netlify / Cloudflare Pages'te repoyu seç (Astro'yu otomatik tanır).
-Sonra `astro.config.mjs` içindeki `site` adresini kendi alan adınla değiştir.
